@@ -819,7 +819,15 @@
         if (btn) { btn.disabled = false; btn.innerText = 'Acceder al Sistema'; }
         return;
       }
-      if (dbAlumnos.length === 0) cargarCacheLocal();
+      if (dbAlumnos.length === 0) cargarCacheLocal()if (dbAlumnos.length === 0) {
+        const { data: atletasRemoto } = await _sb.from('atletas').select('*');
+        if (atletasRemoto && atletasRemoto.length > 0) {
+          dbAlumnos = atletasRemoto.map(a => ({ id: a.id, nombre: a.nombre, edad: a.edad, deporte: a.deporte, experiencia: a.experiencia, lesiones: a.lesiones }));
+          await cargarDatosDesdeSupabase();
+        } else {
+          cargarCacheLocal();
+        }
+      }
       const atletaExiste = dbAlumnos.find(a => a.nombre.toLowerCase() === input.toLowerCase());
       if (!atletaExiste) {
         alert("Atleta no registrado por el profesor Franco.");
