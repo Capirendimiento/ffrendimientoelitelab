@@ -728,7 +728,7 @@
   }
 
   // ─── CARGA DESDE SUPABASE ─────────────────────────────────────────────────
-  async function cargarDatosDesdeSupabase() {
+  async function cargarDatosDesdeSupabase() {     const overlay = document.getElementById('loading-overlay');     if (overlay) { overlay.style.display = 'flex'; }
     const { data: atletasData } = await _sb.from('atletas').select('*').order('created_at', { ascending: true });
     dbAlumnos = (atletasData || []).map(a => ({ id: a.id, nombre: a.nombre, edad: a.edad, deporte: a.deporte, experiencia: a.experiencia, lesiones: a.lesiones }));
 
