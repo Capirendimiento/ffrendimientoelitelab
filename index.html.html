@@ -759,6 +759,7 @@
     (func || []).forEach(f => { const n = f.atletas?.nombre; if (n && f.datos_fms && !dbFuncionales[n]) dbFuncionales[n] = f.datos_fms; });
 
     syncLocalStorage();
+                                            if (overlay) { overlay.style.display = 'none'; }
   }
 
   // ─── HELPERS DE ESCRITURA EN SUPABASE ─────────────────────────────────────
