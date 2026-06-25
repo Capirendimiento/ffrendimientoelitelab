@@ -279,7 +279,17 @@
     </form>
   </div>
 </div>
+<!-- Overlay de carga -->
+<div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7,7,10,0.92); z-index:50000; flex-direction:column; align-items:center; justify-content:center; gap:20px;">
+  <svg viewBox="0 0 50 50" style="width:48px;height:48px;animation:spin 1s linear infinite;">
+    <circle cx="25" cy="25" r="20" fill="none" stroke="#f47920" stroke-width="4" stroke-dasharray="80 20"/>
+  </svg>
+  <p style="font-family:'DM Mono',monospace; font-size:13px; color:#8e8e9c; text-transform:uppercase; letter-spacing:1px;" id="loading-text">Sincronizando datos...</p>
+</div>
 
+<style>
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
 <div class="role-selector-bar">
   <div class="role-title" id="role-display-status">👑 ENTORNO DE TRABAJO: ENTRENADOR DE ALTO RENDIMIENTO</div>
   <div class="role-actions">
