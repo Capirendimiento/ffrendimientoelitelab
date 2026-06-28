@@ -215,6 +215,14 @@
   .day-cell.attended { background: var(--accent-green) !important; color: #060609 !important; font-weight: bold; border-color: var(--accent-green); }
 
   /* Modales */
+  .inline-video-container { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin:6px 0 14px 0; overflow:hidden; animation:fadeIn 0.25s ease; }
+  .inline-video-frame { width:100%; aspect-ratio:16/9; border:none; border-radius:8px 8px 0 0; background:#000; display:block; }
+  .inline-video-info { padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid var(--border); }
+  .inline-video-meta { flex:1; }
+  .inline-video-meta b { font-size:12px; color:var(--accent-green); display:block; margin-bottom:3px; }
+  .inline-video-meta p { font-size:12px; color:var(--text-muted); margin:0; line-height:1.4; }
+  .inline-video-close { background:rgba(255,82,82,0.1); color:var(--accent-red); border:1px solid rgba(255,82,82,0.3); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+  .inline-video-notfound { padding:14px; text-align:center; font-size:12px; font-family:var(--font-mono); color:var(--text-muted); }
   .video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 40000; align-items: center; justify-content: center; padding: 20px; }
   .video-modal-content { background: var(--surface-card); border: 1px solid var(--border); border-radius: 16px; max-width: 800px; width: 100%; padding: 24px; position: relative; }
   .video-close { position: absolute; top: 16px; right: 20px; font-size: 24px; color: var(--text-muted); cursor: pointer; }
@@ -294,7 +302,7 @@
   <div class="role-title" id="role-display-status">👑 ENTORNO DE TRABAJO: ENTRENADOR DE ALTO RENDIMIENTO</div>
   <div class="role-actions">
     <span id="label-user-logged" style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-right:8px;">Profesor: Franco</span>
-    <button class="btn btn-danger" style="padding: 4px 12px; font-size:11px;" onclick="cerrarSesionPlataforma()">Cerrar Sesión</button>
+    <button id="btn-sync-yt" class="btn coach-only-ui" style="padding:4px 12px; font-size:11px; background:var(--accent-green); color:#000;" onclick="sincronizarYouTube()">⚡ Sincronizar YouTube</button> <button class="btn btn-danger" style="padding: 4px 12px; font-size:11px;" onclick="cerrarSesionPlataforma()">Cerrar Sesión</button>
   </div>
 </div>
 
@@ -1047,7 +1055,7 @@
       <input type="text" placeholder="Rep" class="ex-repplan" value="${valores.rp || ''}">
       <input type="text" placeholder="Ser" class="ex-series" value="${valores.s || ''}">
       <input type="text" placeholder="Kg" class="ex-carga ex-carga-alumno" value="${valores.c || ''}">
-      <button class="btn-video-trigger" onclick="openVideoModal(this.parentElement.querySelector('.ex-name').value || 'Ejercicio')">▶</button>
+      <button class="btn-video-trigger" onclick="toggleVideoInline(this)">▶</button>
       <button class="btn-row-delete" onclick="this.parentElement.remove()">✕</button>
     `;
     
@@ -1443,7 +1451,7 @@
     });
   }
 
-  function openVideoModal(name) {
+  // ─── VIDEO INLINE ─────────────────────────────────────────────────────────   async function toggleVideoInline(btn) {     const row = btn.closest('.exercise-row-input');     const nombre = row.querySelector('.ex-name').value.trim();     if (!nombre) { alert('Escribí el nombre del ejercicio primero.'); return; }      let vc = row.nextElementSibling;     if (vc && vc.classList.contains('inline-video-container')) {       vc.remove(); btn.style.background = 'rgba(244,121,32,0.15)'; return;     }      btn.innerText = '⌛'; btn.disabled = true;      const { data } = await _sb       .from('ejercicios_videos')       .select('*')       .ilike('nombre_busqueda', `%${nombre.toLowerCase()}%`)       .limit(1)       .maybeSingle();      btn.innerText = '▶'; btn.disabled = false;      vc = document.createElement('div');     vc.className = 'inline-video-container';      if (data) {       vc.innerHTML = `         <iframe class="inline-video-frame"           src="https://www.youtube.com/embed/${data.youtube_id}?autoplay=1&rel=0"           allow="autoplay; encrypted-media; fullscreen" allowfullscreen>         </iframe>         <div class="inline-video-info">           <div class="inline-video-meta">             <b>💪 ${data.musculos || 'Músculos no especificados'}</b>             <p>${data.descripcion || 'Sin indicación técnica cargada.'}</p>           </div>           <button class="inline-video-close" onclick="this.closest('.inline-video-container').remove()">✕ Cerrar</button>         </div>`;       btn.style.background = 'rgba(244,121,32,0.35)';     } else {       vc.innerHTML = `<div class="inline-video-notfound">📭 Sin video para <b>"${nombre}"</b> — subilo a YouTube y sincronizá.</div>`;       setTimeout(() => vc.remove(), 3000);     }     row.parentNode.insertBefore(vc, row.nextSibling);   }    // ─── SINCRONIZADOR YOUTUBE → SUPABASE ─────────────────────────────────────   function inferirCategoria(nombre) {     const n = nombre.toLowerCase();     if (n.match(/movilidad|estiramiento|elongacion|flexibilidad/)) return 'Movilidad';     if (n.match(/core|plancha|abdominal|bicho|pallof|hollow/))     return 'Core';     if (n.match(/salto|sprint|potencia|pliometrico|cmj/))          return 'Potencia';     if (n.match(/velocidad|agilidad|escalera|conos/))              return 'Velocidad';     return 'Fuerza';   }    async function sincronizarYouTube() {     const btn = document.getElementById('btn-sync-yt');     const YT_KEY = 'AIzaSyCva56btq4hTa-WZbiUUyXM-140Jjt028Y';     const YT_CH  = 'UC8wWoYnY94aPjOKsrjYqm7w';     btn.disabled = true; btn.innerText = '🔄 Conectando...';      try {       const chResp = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YT_CH}&key=${YT_KEY}`);       const chData = await chResp.json();       if (!chData.items?.length) { alert('Canal no encontrado.'); return; }       const playlistId = chData.items[0].contentDetails.relatedPlaylists.uploads;        let videos = [], nextPage = null, pagina = 1;       do {         btn.innerText = `🔄 Leyendo página ${pagina}...`;         const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${YT_KEY}${nextPage ? '&pageToken='+nextPage : ''}`;         const resp = await fetch(url); const data = await resp.json();         if (data.items) videos = videos.concat(data.items);         nextPage = data.nextPageToken; pagina++;       } while (nextPage);        const rows = videos.map(v => ({         nombre:          v.snippet.title.replace(/_/g,' ').replace(/\s+/g,' ').trim(),         nombre_busqueda: v.snippet.title.replace(/_/g,' ').replace(/\s+/g,' ').trim().toLowerCase(),         youtube_id:      v.snippet.resourceId.videoId,         categoria:       inferirCategoria(v.snippet.title)       }));        let ok = 0;       for (let i = 0; i < rows.length; i += 50) {         btn.innerText = `📥 Importando ${ok}/${rows.length}...`;         const { error } = await _sb.from('ejercicios_videos')           .upsert(rows.slice(i, i+50), { onConflict: 'youtube_id' });         if (!error) ok += rows.slice(i, i+50).length;       }        btn.innerText = '⚡ Sincronizar YouTube'; btn.disabled = false;       alert(`✅ ${ok} de ${rows.length} videos sincronizados con la nube.`);      } catch(err) {       alert('Error: ' + err.message);       btn.innerText = '⚡ Sincronizar YouTube'; btn.disabled = false;     }   }   // ──────────────────────────────────────────────────────────────────────────    function openVideoModal(name) {}
     document.getElementById('modal-video-reproductor').style.display = 'flex';
     document.getElementById('video-modal-title').innerText = `Análisis Técnico: ${name}`;
     document.getElementById('video-modal-desc').innerText = "Ejecutar la fase concéntrica a la máxima velocidad posible intencional para reclutar unidades de motor de umbral alto.";
