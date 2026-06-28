@@ -1514,10 +1514,7 @@
     btn.disabled = true; btn.innerText = '🔄 Conectando...';
 
     try {
-      const chResp = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YT_CH}&key=${YT_KEY}`);
-      const chData = await chResp.json();
-      if (!chData.items?.length) { alert('Canal no encontrado.'); return; }
-      const playlistId = chData.items[0].contentDetails.relatedPlaylists.uploads;
+    const playlistId = 'UU' + YT_CH.substring(2);
 
       let videos = [], nextPage = null, pagina = 1;
       do {
