@@ -196,7 +196,7 @@
 
   /* Campos Planificación */
   .exercise-row-input { display: grid; grid-template-columns: 5fr 48px 48px 68px 68px 34px 28px; gap: 8px; margin-bottom: 8px; align-items: center; }
-  .exercise-row-input input { padding: 6px 8px; font-size: 12px; border-radius: 6px; }
+  .exercise-row-input input { padding: 6px 8px; font-size: 12px; border-radius: 6px; width: 100%; }
   .btn-row-delete { background: rgba(255,82,82,0.1); color: var(--accent-red); padding: 6px; cursor: pointer; border-radius: 6px; border:none; height: 31px;}
   .btn-video-trigger { background: rgba(244,121,32,0.15); color: var(--accent); border: 1px solid rgba(244,121,32,0.3); padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px; height: 31px;}
   /* Kg ejecutado por el atleta */
@@ -214,7 +214,7 @@
   body.mode-alumno .ex-disabled-alumno { border: none; background: transparent; pointer-events: none; color: #fff; -webkit-text-fill-color: #fff; font-weight: 500; }
 
   /* ── AUTOCOMPLETADO DE EJERCICIOS ──────────────────── */
-  .autocomplete-wrap { position: relative; }
+  .autocomplete-wrap { position: relative; width: 100%; min-width: 0; }
   .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-card); border: 1px solid var(--accent); border-radius: 8px; z-index: 9999; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-top: 2px; }
   .autocomplete-item { padding: 8px 12px; font-size: 13px; cursor: pointer; color: var(--text); border-bottom: 1px solid var(--border); transition: background 0.15s; }
   .autocomplete-item:last-child { border-bottom: none; }
