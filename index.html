@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2307070a'/><rect x='46' y='8' width='8' height='84' rx='2' fill='%23f47920'/><rect x='20' y='22' width='60' height='14' rx='2' fill='%23f47920'/><rect x='28' y='8' width='44' height='12' rx='2' fill='%23f47920'/><rect x='20' y='64' width='60' height='14' rx='2' fill='%23f47920'/><rect x='28' y='80' width='44' height='12' rx='2' fill='%23f47920'/></svg>">
+<title>F F Entrenamiento Inteligente - High Performance Dashboard v7.7 Definitiva</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700;900&display=swap');
+
+  :root {
+    /* PALETA PROFESIONAL ACTUALIZADA (Negros, Blancos, Naranjas) */
+    --bg: #07070a;
+    --surface: #0d0d12;
+    --surface-card: #14141c;
+    --border: rgba(255, 255, 255, 0.15); /* Borde delineado */
+    --accent: #f47920; /* Naranja corporativo */
+    --accent-red: #ff5252;
+    --accent-green: #2cf290;
+    --accent-blue: #2c90f2;
+    --accent-orange: #ff9f43;
+    --text: #ffffff;
+    --text-muted: #8e8e9c;
+    --font-display: 'Syne', sans-serif;
+    --font-sans: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    /* Le decimos al navegador que este diseño YA es oscuro a propósito.
+       Sin esto, algunos Android (Samsung Internet / Chrome "Temas oscuros
+       para sitios web") reescriben el color de los <input> automáticamente,
+       lo que puede dejar el nombre del ejercicio invisible en celulares
+       puntuales aunque el CSS esté bien — es dependiente del dispositivo,
+       por eso no se reproduce en todos los teléfonos. */
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); overflow-x: hidden; }
+
+  /* --- PANTALLA DE BIENVENIDA (TU DISEÑO ORIGINAL) --- */
+  #welcome-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg); z-index: 30000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.5s ease;
+  }
+  .logo-container { display: flex; align-items: center; margin-bottom: 40px; }
+  .letter-f { font-family: var(--font-sans); font-size: 200px; font-weight: 900; line-height: 0.8; letter-spacing: -8px; color: #fff; }
+  .mirror { transform: scaleX(-1); }
+  .dumbbell-vector { width: 90px; height: 180px; margin: 0 -40px; z-index: 3; }
+  
+  .btn-welcome {
+    background: transparent; border: 2px solid var(--accent); color: white;
+    padding: 18px 44px; border-radius: 50px; cursor: pointer; text-transform: uppercase;
+    font-family: var(--font-display); font-weight: 700; transition: 0.3s; font-size: 14px;
+  }
+  .btn-welcome:hover { background: var(--accent); color: #000; }
+
+  /* --- PANTALLA DE LOGIN --- */
+  .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .login-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 24px; padding: 40px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+  /* --- ICONOS DE CAMPO DELINEADOS Y MINIMALISTAS --- */
+  /* Wrapper que posiciona el icono SVG dentro del input */
+  .field-icon-wrap { position: relative; display: flex; align-items: center; }
+  .field-icon-wrap input { padding-left: 42px; }
+  .field-icon-wrap .field-icon {
+    position: absolute;
+    left: 14px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  /* El icono hereda el color del acento cuando el campo está en foco */
+  .field-icon-wrap:focus-within .field-icon { color: var(--accent); }
+
+  /* Topbar Roles */
+  .role-selector-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .role-title { font-family: var(--font-mono); font-size: 12px; color: var(--accent-green); text-transform: uppercase; letter-spacing: 1px; }
+  .role-actions { display: flex; gap: 12px; align-items: center; }
+
+  .app-container { display: flex; min-height: calc(100vh - 53px); }
+  
+  /* Sidebar — icon rail estilo Instagram: espacioso, limpio, con áreas de toque generosas */
+  .sidebar { width: 88px; background: var(--surface); border-right: 1px solid var(--border); padding: 28px 12px; display: flex; flex-direction: column; flex-shrink: 0; align-items: center; }
+  .brand { display: flex; align-items: center; justify-content: center; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; width: 100%; }
+
+  .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; }
+  /* Cada ítem: cuadrado redondeado de 52 × 52 px — mismo lenguaje visual que Instagram */
+  .nav-item { width: 52px; height: 52px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s, color 0.18s, transform 0.15s; color: var(--text-muted); position: relative; }
+  .nav-item:hover  { background: rgba(255,255,255,0.07); color: var(--text); transform: scale(1.06); }
+  .nav-item.active { background: rgba(244,121,32,0.14); color: var(--accent); }
+  /* Punto indicador debajo del icono activo */
+  .nav-item.active::before { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent); border-radius: 50%; }
+  /* Tooltip contextual a la derecha — mismo patrón que versión anterior */
+  .nav-item::after { content: attr(data-tooltip); position: absolute; left: calc(100% + 16px); top: 50%; transform: translateY(-50%); background: var(--surface-card); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: var(--font-sans); font-weight: 500; padding: 6px 12px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 9999; }
+  .nav-item:hover::after { opacity: 1; }
+  /* Icono SVG 22 × 22 px — hereda color del nav-item para efecto naranja automático */
+  .nav-icon { width: 22px; height: 22px; flex-shrink: 0; }
+
+  /* Main Area */
+  .main-content { flex: 1; padding: 40px; max-width: 1600px; margin: 0 auto; width: 100%; overflow-y: auto; }
+  .view-section { display: none; }
+  .view-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-family: var(--font-display); font-size: 32px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  .grid-functional { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+  /* Sub-tabs */
+  .tab-container { display: flex; gap: 4px; background: var(--surface); padding: 6px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 24px; width: fit-content; flex-wrap: wrap; }
+  .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 10px 16px; font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .tab-btn.active { background: var(--surface-card); color: var(--accent); border: 1px solid var(--border); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── VISTA EVALUACIONES ATLETA ────────────────────── */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .metric-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+  .metric-card .metric-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .metric-card .metric-value { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+  .metric-card .metric-sub { font-size: 12px; color: var(--text-muted); }
+  .metric-card .metric-date { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 8px; opacity: 0.6; }
+  .evolution-chart-wrap { position: relative; height: 220px; }
+  .no-data-msg { text-align: center; padding: 40px; color: var(--text-muted); font-family: var(--font-mono); font-size: 13px; }
+
+  /* ── EXPEDIENTE MÉDICO DIGITAL ─────────────────────── */
+  .doc-upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: 0.2s; margin-bottom: 16px; }
+  .doc-upload-area:hover { border-color: var(--accent); background: rgba(244,121,32,0.03); }
+  .doc-upload-area p { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
+  .doc-list { display: flex; flex-direction: column; gap: 8px; }
+  .doc-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  .doc-icon { font-size: 20px; flex-shrink: 0; }
+  .doc-info { flex: 1; min-width: 0; }
+  .doc-info b { font-size: 13px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-info span { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+  .doc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-doc-view { background: rgba(44,144,242,0.1); color: var(--accent-blue); border: 1px solid rgba(44,144,242,0.3); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+  .btn-doc-del  { background: rgba(255,82,82,0.1); color: var(--accent-red); border: 1px solid rgba(255,82,82,0.3); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+
+  /* Cards & Tables */
+  .card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+  .card-title { font-family: var(--font-display); font-size: 17px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; text-align: left; }
+  th { padding: 12px; color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+  td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+
+  /* --- DISEÑO DE CAMPOS UNIFICADO --- */
+  .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  /* Campos con fondo sutil, padding consistente y transición suave */
+  input, select, textarea { 
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); 
+      padding: 11px 14px; 
+      border-radius: 10px; 
+      color: var(--text); 
+      font-family: var(--font-sans); 
+      font-size: 14px; 
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  /* Foco con glow naranja corporativo — mismo acento que el logo */
+  input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(244,121,32,0.04);
+      box-shadow: 0 0 0 3px rgba(244,121,32,0.12);
+  }
+  input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.6; }
+  /* E4 — Dark mode fix: opciones del select con fondo correcto en todos los navegadores */
+  select option { background: var(--surface-card); color: var(--text); }
+
+  /* --- SISTEMA DE LOGO FF ESCALABLE --- */
+  /* El mismo lenguaje visual que la welcome screen, en dos tamaños reutilizables */
+  .ff-logo { display: flex; align-items: center; justify-content: center; }
+  .ff-logo .f-letter { font-family: var(--font-sans); font-weight: 900; line-height: 1; color: #fff; display: inline-block; }
+  .ff-logo .f-letter.mirror { transform: scaleX(-1); }
+  .ff-logo svg.dumbbell { flex-shrink: 0; }
+  /* Variante Login — mediana */
+  .ff-logo-lg .f-letter { font-size: 68px; letter-spacing: -3px; }
+  .ff-logo-lg svg.dumbbell { width: 26px; height: 52px; margin: 0 -8px; position: relative; z-index: 1; }
+  /* Variante Sidebar — pequeña */
+  .ff-logo-sm .f-letter { font-size: 36px; letter-spacing: -2px; }
+  .ff-logo-sm svg.dumbbell { width: 14px; height: 28px; margin: 0 -4px; position: relative; z-index: 1; }
+  
+  /* Botones */
+  .btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-family: var(--font-sans); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; transition: 0.3s; }
+  .btn:hover { background: var(--accent-orange); }
+  .btn-secondary { background: transparent; border: 1px dashed var(--border); color: var(--text-muted); margin-top: 5px; width: 100%; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: rgba(255,82,82,0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
+  /* Cerrar sesión: visible siempre — coach y atleta */
+  .btn-cerrar-sesion { background: rgba(255,82,82,0.1); color: var(--accent-red); border: 1px solid var(--accent-red); padding: 4px 12px; font-size: 11px; border-radius: 8px; font-family: var(--font-sans); font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .btn-cerrar-sesion:hover { background: rgba(255,82,82,0.25); }
+  .btn-table-delete { background: rgba(255,82,82,0.15); color: var(--accent-red); border: 1px solid rgba(255,82,82,0.3); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+
+  /* Campos Planificación */
+  .exercise-row-input { display: grid; grid-template-columns: 5fr 48px 48px 68px 68px 34px 28px; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .exercise-row-input input { padding: 6px 8px; font-size: 12px; border-radius: 6px; }
+  .btn-row-delete { background: rgba(255,82,82,0.1); color: var(--accent-red); padding: 6px; cursor: pointer; border-radius: 6px; border:none; height: 31px;}
+  .btn-video-trigger { background: rgba(244,121,32,0.15); color: var(--accent); border: 1px solid rgba(244,121,32,0.3); padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px; height: 31px;}
+  /* Kg ejecutado por el atleta */
+  .ex-kg-real { border-color: rgba(44,242,144,0.4) !important; background: rgba(44,242,144,0.05) !important; color: var(--accent-green) !important; font-weight: 700 !important; }
+  .ex-kg-real::placeholder { color: rgba(44,242,144,0.4) !important; }
+  /* Coach ve el kg real del atleta en modo readonly */
+  .ex-kg-real-coach { border-color: rgba(44,242,144,0.3) !important; background: rgba(44,242,144,0.03) !important; color: var(--accent-green) !important; font-size: 11px !important; pointer-events: none !important; }
+
+  /* MODO ALUMNO RESTRICTIONS */
+  body.mode-alumno .coach-only-ui, 
+  body.mode-alumno .btn-secondary, 
+  body.mode-alumno .btn-row-delete,
+  body.mode-alumno .btn-danger { display: none !important; }
+  body.mode-alumno .exercise-row-input { grid-template-columns: 5fr 48px 48px 68px 68px 34px; }
+  body.mode-alumno .ex-disabled-alumno { border: none; background: transparent; pointer-events: none; color: #fff !important; -webkit-text-fill-color: #fff !important; opacity: 1 !important; font-weight: 500; }
+
+  /* ── AUTOCOMPLETADO DE EJERCICIOS ──────────────────── */
+  .autocomplete-wrap { position: relative; }
+  .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-card); border: 1px solid var(--accent); border-radius: 8px; z-index: 9999; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-top: 2px; }
+  .autocomplete-item { padding: 8px 12px; font-size: 13px; cursor: pointer; color: var(--text); border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:hover, .autocomplete-item.selected { background: rgba(244,121,32,0.12); color: var(--accent); }
+  .autocomplete-item span { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-left: 8px; }
+  body.mode-alumno .ex-carga-alumno { background: rgba(255,255,255,0.02); border-color: var(--accent); color: var(--accent); font-weight: bold; }
+  body.mode-alumno .fms-select { pointer-events: none; background: transparent; border: none; color: #fff; font-weight: bold; font-size: 16px; text-align: center; }
+
+  /* Plan Scroll */
+  .plan-horizontal-scroll { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 16px; margin-top: 15px; }
+  .plan-column-day { flex: 0 0 520px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .day-header { font-family: var(--font-display); font-size: 18px; color: var(--accent); border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 16px; }
+  .day-header .day-chevron { display: none; } /* el chevron de acordeón solo se muestra en mobile */
+  .block-section { background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .block-title { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; margin-bottom: 12px; border-left: 3px solid var(--accent); padding-left: 8px; }
+  
+  /* Badges */
+  .badge { padding: 4px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: bold; text-transform: uppercase; }
+  .badge-danger { background: rgba(255,82,82,0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+  .badge-success { background: rgba(44,242,144,0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+  .badge-info { background: rgba(44,144,242,0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+  .badge-warning { background: rgba(255,159,67,0.15); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+  .chip { flex: 0 0 auto; border: 1px solid var(--border); color: var(--text-muted); background: transparent; border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: var(--font-sans); }
+  .chip.on { border-color: var(--accent); color: var(--accent); background: rgba(244,121,32,0.12); }
+
+  /* Matrix Fatiga */
+  .grid-5reps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
+  .grid-5reps input { padding: 6px; font-size: 12px; text-align: center; }
+  .mesocycle-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 15px; }
+  .week-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: 10px; }
+  .week-card h4 { font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; }
+
+  /* Calendario */
+  .single-month-calendar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 600px; margin: 0 auto; }
+  .month-title { font-family: var(--font-display); font-size: 20px; color: var(--accent); margin-bottom: 15px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .days-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 10px; font-weight: bold; }
+  .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+  .day-cell { padding: 12px 0; font-size: 13px; font-family: var(--font-mono); border-radius: 6px; cursor: pointer; border: 1px solid transparent; background: rgba(255,255,255,0.02); transition: all 0.2s; }
+  .day-cell:hover { border-color: var(--accent); background: rgba(244,121,32,0.1); }
+  .day-cell.empty { background: transparent; cursor: default; border: none; }
+  .day-cell.today { border: 1px dashed var(--accent); background: rgba(244,121,32,0.05); color: var(--accent); font-weight: bold; }
+  .day-cell.attended { background: var(--accent-green) !important; color: #060609 !important; font-weight: bold; border-color: var(--accent-green); }
+
+  /* Modales */
+  .inline-video-container { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin:6px 0 14px 0; overflow:hidden; animation:fadeIn 0.25s ease; }
+  .inline-video-frame { width:100%; aspect-ratio:16/9; border:none; border-radius:8px 8px 0 0; background:#000; display:block; }
+  .inline-video-info { padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid var(--border); }
+  .inline-video-meta { flex:1; }
+  .inline-video-meta b { font-size:12px; color:var(--accent-green); display:block; margin-bottom:3px; }
+  .inline-video-meta p { font-size:12px; color:var(--text-muted); margin:0; line-height:1.4; }
+  .inline-video-close { background:rgba(255,82,82,0.1); color:var(--accent-red); border:1px solid rgba(255,82,82,0.3); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+  .inline-video-notfound { padding:14px; text-align:center; font-size:12px; font-family:var(--font-mono); color:var(--text-muted); }
+  .video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 40000; align-items: center; justify-content: center; padding: 20px; }
+  .video-modal-content { background: var(--surface-card); border: 1px solid var(--border); border-radius: 16px; max-width: 800px; width: 100%; padding: 24px; position: relative; }
+  .video-close { position: absolute; top: 16px; right: 20px; font-size: 24px; color: var(--text-muted); cursor: pointer; }
+  .video-placeholder-frame { background: #000; border: 1px solid var(--border); border-radius: 8px; width: 100%; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-family: var(--font-mono); position: relative; overflow: hidden; margin-bottom: 15px;}
+
+  /* ═══════════════════════════════════════════════════════
+     MOBILE RESPONSIVO — FF Performance Lab
+     Breakpoint principal: 768px (celular)
+     Breakpoint tablet: 1024px
+  ═══════════════════════════════════════════════════════ */
+
+  @media (max-width: 1024px) {
+    /* Tablet: sidebar más estrecha, contenido más compacto */
+    .sidebar { width: 72px; padding: 20px 8px; }
+    .main-content { padding: 24px 20px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-functional { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .mesocycle-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+
+    /* ── BIENVENIDA ─────────────────────────────────── */
+    .letter-f { font-size: 100px; letter-spacing: -4px; }
+    .dumbbell-vector { width: 50px; height: 100px; margin: 0 -20px; }
+    .btn-welcome { padding: 14px 32px; font-size: 13px; }
+
+    /* ── LOGIN ──────────────────────────────────────── */
+    .login-card { padding: 28px 20px; border-radius: 16px; }
+    .ff-logo-lg .f-letter { font-size: 48px; }
+    .ff-logo-lg svg.dumbbell { width: 18px; height: 36px; }
+
+    /* ── TOPBAR ─────────────────────────────────────── */
+    .role-selector-bar { padding: 10px 16px; flex-wrap: wrap; gap: 6px; }
+    .role-title { font-size: 10px; letter-spacing: 0.5px; width: 100%; }
+    .role-actions { gap: 6px; }
+    .role-actions .btn { padding: 4px 8px; font-size: 10px; }
+    #label-user-logged { display: none; }
+
+    /* ── LAYOUT: sidebar lateral → barra inferior ───── */
+    .app-container { flex-direction: column; min-height: calc(100vh - 80px); }
+
+    .sidebar {
+      width: 100%;
+      height: 64px;
+      order: 2;                           /* va al fondo */
+      position: fixed;
+      bottom: 0; left: 0;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .brand { display: none; }             /* logo oculto en mobile */
+
+    .nav-menu {
+      flex-direction: row;
+      gap: 0;
+      width: 100%;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      transform: none !important;
+    }
+
+    /* Tooltip desactivado en mobile (no hay hover) */
+    .nav-item::after { display: none !important; }
+
+    /* Punto indicador: arriba en vez de abajo */
+    .nav-item.active::before {
+      top: -5px; bottom: auto;
+    }
+
+    /* ── MAIN CONTENT ───────────────────────────────── */
+    .main-content {
+      padding: 16px;
+      padding-bottom: 80px;              /* espacio para la barra inferior */
+      order: 1;
+    }
+
+    h2 { font-size: 22px; margin-bottom: 16px; }
+
+    /* ── CARDS ──────────────────────────────────────── */
+    .card { padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+    .card-title { font-size: 15px; }
+    .week-card { padding: 12px; }
+
+    /* ── GRIDS → COLUMNA ÚNICA ──────────────────────── */
+    .grid-2 { grid-template-columns: 1fr; gap: 16px; }
+    .grid-functional { grid-template-columns: 1fr; }
+    .mesocycle-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    /* ── TABS DE EVALUACIÓN ─────────────────────────── */
+    .tab-container {
+      width: 100%;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-container::-webkit-scrollbar { display: none; }
+    .tab-btn { font-size: 11px; padding: 8px 10px; white-space: nowrap; }
+
+    /* ── TABLAS → SCROLL HORIZONTAL ────────────────── */
+    .card > table,
+    .card > div > table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* ── PLAN DE CARGAS: ACORDEÓN EN MOBILE ─────────── */
+    /* En desktop/tablet los días siguen en scroll horizontal (sin cambios).
+       En mobile pasan a apilarse verticalmente como acordeón: solo el día
+       abierto muestra sus ejercicios, el resto queda colapsado. */
+    .plan-horizontal-scroll { flex-direction: column; overflow-x: visible; gap: 10px; }
+    .plan-column-day { flex: 1 1 auto; width: 100%; padding: 0; overflow: hidden; }
+
+    .day-header {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; padding: 14px 16px; margin-bottom: 0;
+      border-bottom: none; -webkit-tap-highlight-color: transparent;
+    }
+    .day-header .day-chevron {
+      display: inline-block;
+      font-family: var(--font-sans); font-size: 14px; color: var(--accent);
+      transition: transform 0.25s ease; flex-shrink: 0;
+    }
+    .plan-column-day.day-open .day-header .day-chevron { transform: rotate(180deg); }
+    .plan-column-day.day-open .day-header { border-bottom: 2px solid var(--border); }
+
+    .day-body { display: none; padding: 4px 16px 16px 16px; }
+    .plan-column-day.day-open .day-body { display: block; animation: fadeIn 0.2s ease; }
+    /* Coach mobile: 7 columnas compactas */
+    .exercise-row-input {
+      grid-template-columns: 1fr 32px 32px 52px 52px 28px 24px;
+      gap: 3px;
+    }
+    /* Atleta mobile: oculta Kg Plan para dar espacio al nombre */
+    body.mode-alumno .exercise-row-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+    }
+    body.mode-alumno .exercise-row-input .autocomplete-wrap {
+      flex: 0 0 100%;
+      width: 100%;
+    }
+    body.mode-alumno .exercise-row-input .ex-name {
+      width: 100%;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+      opacity: 1 !important;
+      padding: 4px 0 !important;
+      border: none !important;
+      background: transparent !important;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    body.mode-alumno .exercise-row-input .ex-repplan,
+    body.mode-alumno .exercise-row-input .ex-series { flex: 0 0 52px; }
+    body.mode-alumno .exercise-row-input .ex-carga-alumno { display: none !important; }
+    body.mode-alumno .exercise-row-input .ex-kg-real { flex: 1; min-width: 70px; }
+    body.mode-alumno .exercise-row-input .btn-video-trigger { flex: 0 0 36px; }
+    .exercise-row-input input { padding: 5px 4px; font-size: 11px; }
+    /* Autocomplete wrap en mobile */
+    .autocomplete-wrap { display: block; width: 100%; min-width: 0; }
+
+    /* ── CAMPOS ─────────────────────────────────────── */
+    input, select, textarea { font-size: 16px; } /* evita zoom en iOS */
+
+    /* ── CALENDARIO ─────────────────────────────────── */
+    .single-month-calendar { padding: 14px; }
+    .day-cell { padding: 8px 0; font-size: 12px; }
+
+    /* ── BADGES Y BOTONES ───────────────────────────── */
+    .btn { padding: 10px 16px; font-size: 12px; }
+    .btn-welcome { padding: 14px 28px; }
+
+    /* ── VIDEO INLINE ───────────────────────────────── */
+    .inline-video-info { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .inline-video-close { align-self: flex-end; }
+
+    /* ── SELECTOR COACH ─────────────────────────────── */
+    #eval-selector-box-container,
+    div[style*="width: 250px"],
+    div[style*="width: 300px"] { width: 100% !important; }
+
+    /* ── GRID FATIGA 5×5 ────────────────────────────── */
+    .grid-5reps { gap: 4px; }
+    .grid-5reps input { padding: 5px; font-size: 11px; }
+
+    /* ── ACCIONES PLAN ──────────────────────────────── */
+    div[style*="display:flex; gap:20px"] {
+      flex-direction: column;
+      gap: 12px !important;
+    }
+  }
+
+  /* Mobile muy pequeño (iPhone SE, etc.) */
+  @media (max-width: 390px) {
+    .letter-f { font-size: 76px; }
+    .dumbbell-vector { width: 38px; height: 76px; margin: 0 -14px; }
+    .main-content { padding: 12px; padding-bottom: 80px; }
+    .mesocycle-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Spinner de carga */
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="mode-coach"> 
+
+<!-- PANTALLA DE BIENVENIDA ESTÉTICA -->
+<div id="welcome-screen">
+  <div class="logo-container">
+    <span class="letter-f">F</span>
+    <div class="dumbbell-vector">
+      <svg viewBox="0 0 70 140"><rect x="29" y="4" width="12" height="132" rx="2" fill="#f47920" /><rect x="4" y="24" width="62" height="18" rx="2" fill="#f47920" /><rect x="12" y="8" width="46" height="16" rx="2" fill="#f47920" /><rect x="4" y="98" width="62" height="18" rx="2" fill="#f47920" /><rect x="12" y="116" width="46" height="16" rx="2" fill="#f47920" /></svg>
+    </div>
+    <span class="letter-f mirror">F</span>
+  </div>
+  <button class="btn-welcome" onclick="ingresarFlujoLogin()">Ingresar a la Plataforma</button>
+</div>
+
+<!-- FORMULARIO DE ACCESO (LOGIN) -->
+<div class="login-screen" id="app-login-screen">
+  <div class="login-card">
+    <div class="ff-logo ff-logo-lg" style="margin: 0 auto 32px auto;">
+      <span class="f-letter">F</span>
+      <svg class="dumbbell" viewBox="0 0 70 140" xmlns="http://www.w3.org/2000/svg">
+        <rect x="29" y="4" width="12" height="132" rx="2" fill="#f47920"/>
+        <rect x="4" y="24" width="62" height="18" rx="2" fill="#f47920"/>
+        <rect x="12" y="8" width="46" height="16" rx="2" fill="#f47920"/>
+        <rect x="4" y="98" width="62" height="18" rx="2" fill="#f47920"/>
+        <rect x="12" y="116" width="46" height="16" rx="2" fill="#f47920"/>
+      </svg>
+      <span class="f-letter mirror">F</span>
+    </div>
+
+    <form onsubmit="ejecutarAutenticacionFiltro(event)">
+      <div class="form-group" style="text-align:left;">
+        <label>Email (Coach) · Nombre (Atleta)</label>
+        <div class="field-icon-wrap">
+          <!-- Icono usuario: delineado, sin relleno, trazo mínimo -->
+          <svg class="field-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="5.5" r="2.5"/>
+            <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+          </svg>
+          <input type="text" id="login-user" required placeholder="coach@email.com · Nombre Apellido">
+        </div>
+      </div>
+      <div class="form-group" style="text-align:left; margin-bottom: 24px;">
+        <label>Contraseña Acceso</label>
+        <div class="field-icon-wrap">
+          <!-- Icono candado: delineado, sin relleno, trazo mínimo -->
+          <svg class="field-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="7.5" width="10" height="7.5" rx="1.5"/>
+            <path d="M5 7.5V5a3 3 0 0 1 6 0v2.5"/>
+            <circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <input type="password" id="login-pass" required placeholder="••••••••">
+        </div>
+      </div>
+      <button type="submit" class="btn" style="width:100%; padding:13px; font-size:14px;">Acceder al Sistema</button>
+    </form>
+  </div>
+</div>
+<!-- Overlay de carga -->
+<div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7,7,10,0.92); z-index:50000; flex-direction:column; align-items:center; justify-content:center; gap:20px;">
+  <svg viewBox="0 0 50 50" style="width:48px;height:48px;animation:spin 1s linear infinite;">
+    <circle cx="25" cy="25" r="20" fill="none" stroke="#f47920" stroke-width="4" stroke-dasharray="80 20"/>
+  </svg>
+  <p style="font-family:'DM Mono',monospace; font-size:13px; color:#8e8e9c; text-transform:uppercase; letter-spacing:1px;" id="loading-text">Sincronizando datos...</p>
+</div>
+
+<div class="role-selector-bar">
+  <div class="role-title" id="role-display-status">👑 ENTORNO DE TRABAJO: ENTRENADOR DE ALTO RENDIMIENTO</div>
+  <div class="role-actions">
+    <span id="label-user-logged" style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-right:8px;">Profesor: Franco</span>
+    <button id="btn-sync-yt" class="btn coach-only-ui" style="padding:4px 12px; font-size:11px; background:var(--accent-green); color:#000;" onclick="sincronizarYouTube()">⚡ Sincronizar YouTube</button>
+    <button class="btn-cerrar-sesion" onclick="cerrarSesionPlataforma()">Cerrar Sesión</button>
+  </div>
+</div>
+
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="ff-logo ff-logo-sm">
+        <span class="f-letter">F</span>
+        <svg class="dumbbell" viewBox="0 0 70 140" xmlns="http://www.w3.org/2000/svg">
+          <rect x="29" y="4" width="12" height="132" rx="2" fill="#f47920"/>
+          <rect x="4" y="24" width="62" height="18" rx="2" fill="#f47920"/>
+          <rect x="12" y="8" width="46" height="16" rx="2" fill="#f47920"/>
+          <rect x="4" y="98" width="62" height="18" rx="2" fill="#f47920"/>
+          <rect x="12" y="116" width="46" height="16" rx="2" fill="#f47920"/>
+        </svg>
+        <span class="f-letter mirror">F</span>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item active coach-only-ui" id="nav-dash" data-tooltip="Control General" onclick="switchView('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="8" width="3.5" height="7" rx="0.5"/><rect x="6.5" y="4.5" width="3" height="10.5" rx="0.5"/><rect x="12" y="1" width="3" height="14" rx="0.5"/></svg>
+      </li>
+      <li class="nav-item coach-only-ui" id="nav-alum" data-tooltip="Fichas Anamnesis" onclick="switchView('alumnos')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="4.5" r="2.5"/><path d="M0.5 14.5c0-2.8 2.2-5 5-5s5 2.2 5 5"/><circle cx="12.5" cy="4" r="1.8" stroke-width="1.3"/><path d="M15.5 13c0-2-1.4-3.5-3-3.5" stroke-width="1.3"/></svg>
+      </li>
+      <li class="nav-item" id="nav-plan" data-tooltip="Planificación Cargas" onclick="switchView('planificaciones')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="13" height="13" rx="1.5"/><line x1="1.5" y1="6" x2="14.5" y2="6"/><line x1="1.5" y1="10.5" x2="14.5" y2="10.5"/><line x1="6" y1="6" x2="6" y2="14.5"/></svg>
+      </li>
+      <li class="nav-item" id="nav-eval" data-tooltip="Lab Biomecánico" onclick="switchView('evaluaciones')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v5.5L2.5 13.5h11L10 7.5V2"/><line x1="5" y1="2" x2="11" y2="2"/><circle cx="9" cy="11" r="0.9" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+      </li>
+      <li class="nav-item" id="nav-cal" data-tooltip="Calendario &amp; RPE" onclick="switchView('calendario')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="14" height="12" rx="1.5"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/><rect x="3.5" y="9.5" width="2" height="2" rx="0.3" fill="currentColor" stroke="none"/><rect x="9" y="9.5" width="2" height="2" rx="0.3" fill="currentColor" stroke="none"/></svg>
+      </li>
+      <li class="nav-item" id="nav-cargas" data-tooltip="Historial de Cargas" onclick="switchView('cargas')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 14.5V1.5"/><path d="M1.5 14.5h13"/><path d="M4 11l3-3.5 2.5 2L14 5"/></svg>
+      </li>
+      <li class="nav-item coach-only-ui" id="nav-biblio" data-tooltip="Biblioteca de Ejercicios" onclick="switchView('biblioteca')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"/></svg>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    
+    <section id="view-dashboard" class="view-section active coach-only-ui">
+      <h2>Panel de Control General</h2>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Asistencia y Fatiga Sistémica Global</div>
+          <div id="dash-chart-placeholder" style="text-align:center; padding:60px 0; color:var(--text-muted); font-size:13px; font-family:var(--font-mono);">
+            [ SIN REGISTROS DE ASISTENCIA ]<br>Los gráficos se modelarán automáticamente al ingresar RPE reales.
+          </div>
+          <canvas id="chartAsistencia" height="200" style="display:none;"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Alertas Biomecánicas de Cadenas Cinemáticas</div>
+          <div id="dashboard-alertas">
+            <p style="color:var(--text-muted); font-size:13px; font-family:var(--font-mono); text-align:center; padding:40px 0;">
+              Esperando ingreso de datos diagnósticos en el laboratorio funcional e isométrico.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-alumnos" class="view-section coach-only-ui">
+      <h2>Gestión y Alta de Deportistas</h2>
+      <div class="card">
+        <div class="card-title">Registrar Nuevo Atleta</div>
+        <form id="form-alumno" onsubmit="saveAlumno(event)" class="grid-2" style="margin-bottom:0;">
+          <div>
+            <div class="form-group"><label>Nombre Completo</label><input type="text" id="al-nombre" required placeholder="Ej: Juan Perez"></div>
+            <div class="form-group"><label>Edad</label><input type="number" id="al-edad" required placeholder="Ej: 25"></div>
+            <div class="form-group"><label>Deporte / Especialidad</label><input type="text" id="al-deporte" required placeholder="Ej: Rugby 7"></div>
+          </div>
+          <div>
+            <div class="form-group"><label>Nivel Competitivo</label><input type="text" id="al-experiencia" required placeholder="Ej: Alto Rendimiento"></div>
+            <div class="form-group"><label>PIN de Acceso del Atleta (4 a 6 dígitos)</label><input type="text" id="al-pin" required pattern="[0-9]{4,6}" maxlength="6" placeholder="Ej: 4821" title="4 a 6 números"></div>
+            <div class="form-group"><label>Historial Clínico / Lesiones</label><textarea id="al-lesiones" rows="3" placeholder="Ej: Operación LCA..."></textarea></div>
+            <button type="submit" class="btn" style="margin-top:10px; width:100%;">Crear Ficha Relacional</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Atletas Registrados en la Base de Datos</div>
+        <!-- Doble clic en nombre del atleta para subir estudio médico -->
+        <input type="file" id="doc-file-input" style="display:none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="subirDocumentoMedico(this)">
+        <div id="doc-upload-status" style="display:none; font-size:12px; font-family:var(--font-mono); color:var(--accent-green); margin-bottom:12px; padding:8px 12px; background:rgba(44,242,144,0.05); border-radius:8px; border:1px solid rgba(44,242,144,0.2);"></div>
+        <p style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:10px;">💡 Doble clic en el nombre del atleta para subir un estudio médico</p>
+        <table>
+          <thead><tr><th>Deportista</th><th>Edad</th><th>Deporte</th><th>Especialidad</th><th>Historial Médico</th><th style="text-align:right;">Acción</th></tr></thead>
+          <tbody id="tabla-alumnos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-planificaciones" class="view-section">
+      <h2 id="plan-section-title">Prescripción de la Carga de Entrenamiento</h2>
+      <div id="plan-view-error" class="card"><p style="color:var(--text-muted); text-align:center;">No existen atletas cargados en el sistema.</p></div>
+      
+      <div id="plan-view-content" style="display:none;">
+        <div class="card">
+          <div style="display:flex; gap:20px; margin-bottom:20px; flex-wrap:wrap;" class="coach-only-ui">
+            <div class="form-group" style="width: 250px;"><label>Seleccionar Deportista:</label><select id="plan-alumno-assigned" onchange="cargarPlanDeAtletaSeleccionado()"></select></div>
+            <div style="display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap;">
+              <button class="btn" style="background:var(--accent);" onclick="addPlanDay()">＋ Añadir Día</button>
+              <button class="btn btn-danger" onclick="removeLastPlanDay()">－ Eliminar Último Día</button>
+              <button class="btn" style="background:var(--accent-blue); color:#fff;" onclick="crearNuevoPeriodo()">＋ Nuevo Período</button>
+            </div>
+          </div>
+          <div class="card coach-only-ui" style="padding:14px 24px; margin-bottom:16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <div class="form-group" style="margin:0; min-width:200px;">
+              <label>Período del Plan</label>
+              <select id="plan-periodo-select" onchange="cambiarPeriodoPlan()"></select>
+            </div>
+            <span id="plan-periodo-badge" class="badge badge-success" style="margin-top:18px;">ACTIVO</span>
+            <button class="btn" style="margin-top:18px; background:var(--accent-green); color:#000; font-size:11px;" onclick="marcarPeriodoActivo()">✓ Marcar como Activo</button>
+          </div>
+
+          <div style="margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px;">
+            <h3 style="font-family:var(--font-display); font-size:15px; color:#fff;">Distribución Semanal del Mesociclo de Carga</h3>
+            <div class="mesocycle-grid">
+              <div class="week-card"><h4>Semana 1</h4><div class="form-group"><label>Carga</label><input type="text" class="meso-input coach-only-ui" id="meso-s1"><div class="ex-disabled-alumno info-s1" style="font-weight:bold;"></div></div></div>
+              <div class="week-card"><h4>Semana 2</h4><div class="form-group"><label>Carga</label><input type="text" class="meso-input coach-only-ui" id="meso-s2"><div class="ex-disabled-alumno info-s2" style="font-weight:bold;"></div></div></div>
+              <div class="week-card"><h4>Semana 3</h4><div class="form-group"><label>Carga</label><input type="text" class="meso-input coach-only-ui" id="meso-s3"><div class="ex-disabled-alumno info-s3" style="font-weight:bold;"></div></div></div>
+              <div class="week-card"><h4>Semana 4</h4><div class="form-group"><label>Carga</label><input type="text" class="meso-input coach-only-ui" id="meso-s4"><div class="ex-disabled-alumno info-s4" style="font-weight:bold;"></div></div></div>
+            </div>
+          </div>
+
+          <div class="plan-horizontal-scroll" id="plan-days-container"></div>
+          <button class="btn" style="margin-top:20px; width:100%;" onclick="guardarPlanificacionCompleta()">Almacenar y Sincronizar Cambios de Carga</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-evaluaciones" class="view-section">
+      <h2>Diagnóstico Funcional, De Fuerza &amp; Saltabilidad Neuromuscular</h2>
+      <div id="eval-view-error" class="card"><p style="color:var(--text-muted); text-align:center;">No existen atletas cargados en el sistema.</p></div>
+
+      <!-- VISTA EXCLUSIVA ATLETA -->
+      <div id="eval-athlete-panel" style="display:none;">
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg,rgba(244,121,32,0.06),rgba(44,144,242,0.04));">
+          <div class="card-title">📊 Tu Perfil de Rendimiento</div>
+          <div class="metric-grid" id="athlete-metric-grid">
+            <div class="no-data-msg">Cargando tus métricas...</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">📈 Evolución de Saltabilidad (CMJ)</div>
+          <div class="evolution-chart-wrap">
+            <canvas id="chartEvolucionAtleta"></canvas>
+            <div id="cmj-no-data-msg" class="no-data-msg" style="display:none;">Necesitás al menos 2 tests CMJ para ver la evolución.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Historial Completo de Evaluaciones</div>
+          <table>
+            <thead><tr><th>Fecha</th><th>Test</th><th>Músculo/Gesto</th><th>Métricas</th><th>Diagnóstico</th></tr></thead>
+            <tbody id="tabla-historial-eval-atleta"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="eval-view-content" style="display:none;">
+        <div class="card" style="padding: 16px 24px; margin-bottom: 16px;" class="coach-only-ui">
+          <div class="form-group" style="width: 300px; margin-bottom:0;" id="eval-selector-box-container">
+            <label>Atleta en Plataforma / Dinamómetro:</label>
+            <select id="eval-alumno-select" onchange="cambiarAtletaEvaluacion()"></select>
+          </div>
+        </div>
+
+        <div class="tab-container">
+          <button class="tab-btn active" id="btn-tab-dina" onclick="switchSubTab('dina')">
+            <!-- Onda de fuerza pico: señal de dinamómetro / RFD -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;"><polyline points="1,12 4,12 5.5,4 7.5,12 9.5,12"/><line x1="9.5" y1="12" x2="15" y2="12"/></svg>
+            Isometría Máxima (Fuerza Pico &amp; RFD)
+          </button>
+          <button class="tab-btn" id="btn-tab-axon" onclick="switchSubTab('axon')">
+            <!-- Figura en salto: saltabilidad neuromuscular -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;"><circle cx="8" cy="2.5" r="1.5"/><path d="M5.5 11.5l2.5-5.5 2.5 5.5"/><path d="M6.5 9l-2 3"/><path d="M9.5 9l2 3"/><line x1="4" y1="15" x2="12" y2="15"/></svg>
+            Axon Jump &amp; Índice Elasticidad
+          </button>
+          <button class="tab-btn" id="btn-tab-funcional" onclick="switchSubTab('funcional')">
+            <!-- Triángulo con línea de referencia: ángulo funcional / evaluación postural -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;"><path d="M2 14L8 2l6 12z"/><line x1="5.5" y1="10" x2="10.5" y2="10" stroke-dasharray="2 1.5"/></svg>
+            Laboratorio de Evaluación Funcional
+          </button>
+          <button class="tab-btn" id="btn-tab-fatiga" onclick="switchSubTab('fatiga')">
+            <!-- Cronómetro: protocolo intermitente temporizado -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;"><circle cx="8" cy="9.5" r="5.5"/><path d="M8 7v2.5l2 1.5"/><line x1="6" y1="1.5" x2="10" y2="1.5"/><line x1="8" y1="1.5" x2="8" y2="3.5"/><line x1="13.5" y1="3.5" x2="15" y2="2"/></svg>
+            Test Intermitente de Fatiga (5x5s)
+          </button>
+        </div>
+
+        <div id="tab-dina" class="tab-content active">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Entrada de Datos Dinamómetro</div>
+              <div class="coach-only-ui">
+                <div class="form-group"><label>Grupo Muscular</label><select id="eva-dina-grupo"><option value="Cuadriceps">Cuádriceps</option><option value="Isquios">Isquiotibiales</option></select></div>
+                <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <p style="font-size:11px; color:var(--accent-blue); margin-bottom:6px;">HEMISFERIO DERECHO</p>
+                    <div class="form-group"><label>Fza. Pico (Kg)</label><input type="number" step="0.01" id="eva-dina-pd" value="0"></div>
+                    <div class="form-group"><label>RFD (Kg/s)</label><input type="number" step="0.01" id="eva-dina-rfdd" value="0"></div>
+                  </div>
+                  <div>
+                    <p style="font-size:11px; color:var(--accent-red); margin-bottom:6px;">HEMISFERIO IZQUIERDO</p>
+                    <div class="form-group"><label>Fza. Pico (Kg)</label><input type="number" step="0.01" id="eva-dina-pi" value="0"></div>
+                    <div class="form-group"><label>RFD (Kg/s)</label><input type="number" step="0.01" id="eva-dina-rfdi" value="0"></div>
+                  </div>
+                </div>
+                <button class="btn" style="width:100%;" onclick="guardarIsometriaMaxima()">Procesar Simetrías Isométricas</button>
+              </div>
+              <div class="ex-disabled-alumno"><p style="color:var(--text-muted); font-size:13px;">Datos gestionados en laboratorio por Franco Flores.</p></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Análisis Automatizado de Simetrías Dinámicas</div>
+              <div id="dina-analisis-vacio" style="color:var(--text-muted); text-align:center; padding:30px 0;">Esperando captura...</div>
+              <div id="dina-analisis-resultado" style="display:none;">
+                <div style="margin-bottom:14px;"><label>Déficit de Fuerza Pico:</label><div style="display:flex; align-items:center; gap:12px;"><span id="asim-pico-badge" class="badge">0%</span><p id="asim-pico-txt" style="font-size:13px; font-weight:500;"></p></div></div>
+                <div style="margin-bottom:14px; border-top: 1px solid var(--border); padding-top:10px;"><label>Déficit Exclusivo de RFD:</label><div style="display:flex; align-items:center; gap:12px;"><span id="asim-rfd-badge" class="badge">0%</span><p id="asim-rfd-txt" style="font-size:13px; font-weight:500;"></p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-axon" class="tab-content">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Módulo de Saltabilidad Neuromuscular (Axon Jump)</div>
+              <div class="coach-only-ui">
+                <div class="form-group"><label>Tipo de Salto Registrado</label><select id="axon-tipo-salto"><option value="Squat Jump">Squat Jump (Fuerza Explosiva Pura)</option><option value="CMJ">Countermovement Jump (CEA Corto)</option></select></div>
+                <div class="form-group"><label>Tiempo de Vuelo (ms)</label><input type="number" id="axon-vuelo" value="0"></div>
+                <button class="btn" style="width:100%; margin-top:10px;" onclick="guardarSaltoAxon()">Procesar Salto e Índice</button>
+              </div>
+              <div class="ex-disabled-alumno"><p style="color:var(--text-muted); font-size:13px;">Registros biométricos procesados con alfombra cinemática.</p></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Métricas Estructurales de Salto</div>
+              <div id="axon-resultado-box" style="text-align:center; padding:5px 0;">
+                <p style="font-size:11px; font-family:var(--font-mono); color:var(--text-muted); text-transform:uppercase;">Última Altura Calculada</p>
+                <h1 id="axon-calc-altura" style="font-family:var(--font-display); font-size:44px; color:var(--accent-green); margin-bottom:15px;">0.00 <span style="font-size:18px;">cm</span></h1>
+                
+                <div style="border-top:1px solid var(--border); padding-top:15px; text-align:left;">
+                  <label>Índice de Elasticidad Relativo (IE %):</label>
+                  <div style="display:flex; align-items:center; gap:12px; margin-top:5px;">
+                    <span id="axon-ie-badge" class="badge badge-info">0.0%</span>
+                    <p id="axon-ie-txt" style="font-size:13px; font-weight:500; color:var(--text-muted);">Requiere perfil completo (SJ & CMJ)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-funcional" class="tab-content">
+          <div class="card">
+            <div class="card-title">Batería Funcional Cualicuantitativa (Escala de Screening 1 a 5)</div>
+            <div class="grid-functional">
+              
+              <div class="week-card">
+                <h4 style="color:var(--accent-green);">1. Complejos Globales</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Sentadilla de Arranque (OHS)</label>
+                  <select id="fms-ohs" class="fms-select"><option value="1">1 - Restricción Severa / Dolor</option><option value="2">2 - Compensación Mayor</option><option value="3">3 - Compensación Mínima</option><option value="4">4 - Movilidad Eficiente</option><option value="5">5 - Patrón Óptimo Élite</option></select>
+                </div>
+                <div class="form-group"><label>Sentadilla Unipodal (SLS) - Izq</label>
+                  <select id="fms-sls-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Sentadilla Unipodal (SLS) - Der</label>
+                  <select id="fms-sls-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+              </div>
+
+              <div class="week-card">
+                <h4 style="color:var(--accent-blue);">2. Lombo-Pélvico-Cadera</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Test de Thomas - Izq</label>
+                  <select id="fms-thomas-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Test de Thomas - Der</label>
+                  <select id="fms-thomas-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Cadera Internos - Izq</label>
+                  <select id="fms-rot-int-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Cadera Internos - Der</label>
+                  <select id="fms-rot-int-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Cadera Externos - Izq</label>
+                  <select id="fms-rot-ext-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Cadera Externos - Der</label>
+                  <select id="fms-rot-ext-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+              </div>
+
+              <div class="week-card">
+                <h4 style="color:var(--accent-orange);">3. Cadena Posterior (Isquios)</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Wells and Dillon (Global)</label>
+                  <select id="fms-wells" class="fms-select"><option value="5">5 - Flexibilidad Sobresaliente</option><option value="4">4 - Rango Completo Sin Estrés</option><option value="3">3 - Alcanza Plano Neutro</option><option value="2">2 - Restricción Moderada</option><option value="1">1 - Acortamiento Severo</option></select>
+                </div>
+                <div class="form-group"><label>Isquios Extensión 90° - Izq</label>
+                  <select id="fms-isq-i" class="fms-select"><option value="5">5 - Óptimo (Llega)</option><option value="2">2 - Reducido (No llega)</option></select>
+                </div>
+                <div class="form-group"><label>Isquios Extensión 90° - Der</label>
+                  <select id="fms-isq-d" class="fms-select"><option value="5">5 - Óptimo (Llega)</option><option value="2">2 - Reducido (No llega)</option></select>
+                </div>
+              </div>
+
+              <div class="week-card">
+                <h4 style="color:var(--accent-red);">4. Tobillo & Hombro</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Test de Lunge (Tobillo) - Izq</label>
+                  <select id="fms-lunge-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Test de Lunge (Tobillo) - Der</label>
+                  <select id="fms-lunge-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Hombro Internos - Izq</label>
+                  <select id="fms-homb-int-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Hombro Internos - Der</label>
+                  <select id="fms-homb-int-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Hombro Externos - Izq</label>
+                  <select id="fms-homb-ext-i" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+                <div class="form-group"><label>Rotadores Hombro Externos - Der</label>
+                  <select id="fms-homb-ext-d" class="fms-select"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                </div>
+              </div>
+
+            </div>
+            <button class="btn coach-only-ui" style="width:100%; margin-top:20px; background:var(--accent-green); color:#000;" onclick="guardarScreeningFuncional()">Sincronizar y Mapear Screening Funcional</button>
+          </div>
+        </div>
+
+        <div id="tab-fatiga" class="tab-content">
+          <div class="card">
+            <div class="card-title">Protocolo de Fatiga en Isometría Intermitente (5x5s)</div>
+            <div class="coach-only-ui">
+              <div class="grid-2" style="gap:24px;">
+                <div>
+                  <p style="font-size:12px; color:var(--accent-blue); margin-bottom:10px;">SERIE PIERNA DERECHA (Kg)</p>
+                  <div class="grid-5reps">
+                    <div><label>R1</label><input type="number" id="f-d-r1" value="0"></div>
+                    <div><label>R2</label><input type="number" id="f-d-r2" value="0"></div>
+                    <div><label>R3</label><input type="number" id="f-d-r3" value="0"></div>
+                    <div><label>R4</label><input type="number" id="f-d-r4" value="0"></div>
+                    <div><label>R5</label><input type="number" id="f-d-r5" value="0"></div>
+                  </div>
+                </div>
+                <div>
+                  <p style="font-size:12px; color:var(--accent-red); margin-bottom:10px;">SERIE PIERNA IZQUIERDA (Kg)</p>
+                  <div class="grid-5reps">
+                    <div><label>R1</label><input type="number" id="f-i-r1" value="0"></div>
+                    <div><label>R2</label><input type="number" id="f-i-r2" value="0"></div>
+                    <div><label>R3</label><input type="number" id="f-i-r3" value="0"></div>
+                    <div><label>R4</label><input type="number" id="f-i-r4" value="0"></div>
+                    <div><label>R5</label><input type="number" id="f-i-r5" value="0"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn" style="width:100%; margin-top:15px;" onclick="calcularYGuardarFatiga5x5()">Ejecutar Análisis de Fatiga Neuromuscular</button>
+            </div>
+            <div id="resultado-fatiga-completo" style="margin-top:20px; display:none;">
+              <div class="grid-2">
+                <div class="week-card"><p style="color:var(--accent-blue); font-weight:bold;">MIEMBRO DERECHO</p><div style="font-size:13px; margin-top:6px;">Índice de Fatiga Real: <b id="fat-d-porcentaje" style="color:var(--accent-red)">0%</b></div></div>
+                <div class="week-card"><p style="color:var(--accent-red); font-weight:bold;">MIEMBRO IZQUIERDO</p><div style="font-size:13px; margin-top:6px;">Índice de Fatiga Real: <b id="fat-i-porcentaje" style="color:var(--accent-red)">0%</b></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Historial Diagnóstico de Evaluaciones</div>
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo de Test</th><th>Músculo/Gesto</th><th>Métricas</th><th>Diagnóstico</th></tr></thead>
+            <tbody id="tabla-historial-eval"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-calendario" class="view-section">
+      <h2>Calendario de Monitoreo & Control de Cargas Internas (RPE)</h2>
+      <div id="cal-view-error" class="card"><p style="color:var(--text-muted); text-align:center;">No existen atletas cargados en el sistema.</p></div>
+      
+      <div id="cal-view-content" style="display:none;" class="grid-2">
+        <div class="card">
+          <div class="card-title">Asistencias del Mes en Curso Interactivo</div>
+          <div class="single-month-calendar">
+            <div class="month-title" id="calendar-current-month-title">Mes Actual 2026</div>
+            <div class="days-grid-header"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+            <div class="days-grid" id="calendar-current-month-grid"></div>
+          </div>
+        </div>
+        <div class="card" id="panel-borg-rpe">
+          <div class="card-title" style="color:var(--accent-blue)">Escala de Percepción de Esfuerzo (Borg RPE)</div>
+          <div class="form-group">
+            <label>Nivel Esfuerzo (Borg 6-20)</label>
+            <select id="borg-select-value">
+              <option value="6">6 - Reposo Absoluto</option>
+              <option value="12">12 - Algo duro</option>
+              <option value="15">15 - Duro (Fatiga manifiesta)</option>
+              <option value="18">18 - Extremadamente duro</option>
+              <option value="20">20 - Esfuerzo Máximo</option>
+            </select>
+          </div>
+          <button class="btn" style="width:100%; background:var(--accent-green); color:#000;" onclick="registrarAsistenciaConRPE()">Registrar Esfuerzo del Día</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-cargas" class="view-section">
+      <h2>Historial de Cargas</h2>
+      <div class="card">
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px;">
+          <div class="form-group coach-only-ui" style="width:250px; margin:0;">
+            <label>Seleccionar Deportista:</label>
+            <select id="cargas-alumno" onchange="renderCargasView()"></select>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="tab-btn active" id="cargas-tab-sesion" onclick="setCargasTab('sesion')">Por Sesión</button>
+            <button class="tab-btn" id="cargas-tab-ejercicio" onclick="setCargasTab('ejercicio')">Por Ejercicio</button>
+          </div>
+        </div>
+        <div id="cargas-stats" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;"></div>
+        <div id="cargas-vacio" class="no-data-msg">Elegí un atleta para ver su historial.</div>
+        <div id="cargas-sesion-view"></div>
+        <div id="cargas-ejercicio-view" style="display:none;">
+          <div class="chips" id="cargas-ex-chips" style="display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; padding-bottom:2px;"></div>
+          <div class="card" style="background:var(--bg);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 id="cargas-ex-title" style="font-size:16px;"></h3>
+              <div style="text-align:right;"><div id="cargas-ex-delta" style="color:var(--accent-green); font-weight:700;"></div></div>
+            </div>
+            <svg width="100%" height="120" viewBox="0 0 560 120" role="img" aria-label="Curva de progreso"><polyline id="cargas-ex-curve" points="" fill="none" stroke="#2cf290" stroke-width="3"/></svg>
+            <table id="cargas-ex-table" style="width:100%; border-collapse:collapse; font-size:13px; margin-top:8px;"></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-biblioteca" class="view-section coach-only-ui">
+      <h2>Biblioteca de Ejercicios</h2>
+      <div class="card">
+        <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px;">
+          <div class="form-group" style="width:220px; margin:0;"><label>Deportista:</label><select id="biblio-alumno"></select></div>
+          <div class="form-group" style="width:110px; margin:0;"><label>Día:</label><select id="biblio-dia"><option value="1">Día 1</option><option value="2">Día 2</option><option value="3">Día 3</option><option value="4">Día 4</option><option value="5">Día 5</option><option value="6">Día 6</option></select></div>
+          <div class="form-group" style="width:150px; margin:0;"><label>Bloque:</label><select id="biblio-bloque"><option value="movilidad">Movilidad</option><option value="core">Core</option><option value="fuerza" selected>Fuerza</option></select></div>
+        </div>
+        <div class="card" style="background:var(--bg); margin-bottom:16px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Ejercicios agregados en esta sesión de trabajo</div>
+          <div id="biblio-agregados" class="no-data-msg" style="padding:10px 0;">Todavía no agregaste ningún ejercicio desde acá.</div>
+        </div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+          <input type="text" id="biblio-search" placeholder="Buscar ejercicio…" oninput="renderBiblioteca()" style="flex:1; min-width:180px;">
+        </div>
+        <div id="biblio-chips" style="display:flex; gap:8px; overflow-x:auto; margin-bottom:16px; padding-bottom:2px;"></div>
+        <div id="biblio-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px;"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="video-modal" id="modal-video-reproductor">
+  <div class="video-modal-content">
+    <span class="video-close" onclick="closeVideoModal()">✕</span>
+    <h3 id="video-modal-title" style="font-family:var(--font-display); font-size:20px; color:var(--accent);">Video Técnico</h3>
+    <div class="video-placeholder-frame">
+       <div style="text-align:center;">
+          <svg viewBox="0 0 56 56" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" style="width:48px;height:48px;margin-bottom:10px;">
+            <line x1="6" y1="28" x2="50" y2="28"/>
+            <rect x="3" y="20" width="8" height="16" rx="1.5" fill="var(--text-muted)" stroke="none" opacity="0.6"/>
+            <rect x="11" y="16" width="5" height="24" rx="1" fill="var(--text-muted)" stroke="none" opacity="0.8"/>
+            <rect x="45" y="20" width="8" height="16" rx="1.5" fill="var(--text-muted)" stroke="none" opacity="0.6"/>
+            <rect x="40" y="16" width="5" height="24" rx="1" fill="var(--text-muted)" stroke="none" opacity="0.8"/>
+          </svg>
+          <p>Cargando pautas biomecánicas del ejercicio...</p>
+       </div>
+    </div>
+    <div style="background:var(--surface); padding:14px; border-radius:8px; border:1px solid var(--border);">
+      <label style="color:var(--accent-green)">Indicación Estructural del Profesor:</label>
+      <p id="video-modal-desc" style="font-size:13px; color:var(--text-muted); margin-top:5px;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── SUPABASE CONFIG ──────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://idfohxodfuvlmeaybjey.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_QZzhu4J_p_IhjSXElc3b-g_oCkxb_5q';
+  const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ─── SEGURIDAD: SANITIZACIÓN ANTES DE INSERTAR EN EL DOM (anti-XSS) ────────
+  // Cualquier dato que venga de la base (nombre de ejercicio, notas médicas,
+  // diagnósticos, nombre de atletas, etc.) se inserta en la página con
+  // innerHTML en varios lugares. Si ese texto llegara a contener HTML/JS
+  // (por error de tipeo, o por un tercero que logre escribir en la base),
+  // se ejecutaría como código dentro de la sesión de quien lo esté viendo.
+  // Esta función neutraliza esos caracteres antes de insertarlos.
+  function escapeHtml(valor) {
+    if (valor === null || valor === undefined) return '';
+    return String(valor)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ─── ESTADO LOCAL ─────────────────────────────────────────────────────────
+  let dbAlumnos         = [];
+  let dbPlanificaciones = {};
+  // periodoActual: período seleccionado por atleta → { "Juan": "Enero 2026" }
+  let periodoActualPorAtleta = {};
+  let dbEvaluaciones    = {};
+  let dbAsistencias     = {};
+  let dbFuncionales     = {};
+
+  let totalDiasPlan       = 3;
+  let globalChartInstance = null;
+  let celdaSeleccionada   = null;
+  let usuarioLogueadoActual = "";
+  let coachUserId           = null;
+
+  // ─── CACHE LOCAL (permite que atletas accedan sin sesión activa) ──────────
+  function syncLocalStorage() {
+    localStorage.setItem('FF_dbAlumnos',         JSON.stringify(dbAlumnos));
+    localStorage.setItem('FF_dbPlanificaciones', JSON.stringify(dbPlanificaciones));
+    localStorage.setItem('FF_dbEvaluaciones',    JSON.stringify(dbEvaluaciones));
+    localStorage.setItem('FF_dbAsistencias',     JSON.stringify(dbAsistencias));
+    localStorage.setItem('FF_dbFuncionales',     JSON.stringify(dbFuncionales));
+  }
+
+  function cargarCacheLocal() {
+    dbAlumnos         = JSON.parse(localStorage.getItem('FF_dbAlumnos'))         || [];
+    dbPlanificaciones = JSON.parse(localStorage.getItem('FF_dbPlanificaciones')) || {};
+    dbEvaluaciones    = JSON.parse(localStorage.getItem('FF_dbEvaluaciones'))    || {};
+    dbAsistencias     = JSON.parse(localStorage.getItem('FF_dbAsistencias'))     || {};
+    dbFuncionales     = JSON.parse(localStorage.getItem('FF_dbFuncionales'))     || {};
+  }
+
+  // ─── CARGA DESDE SUPABASE ─────────────────────────────────────────────────
+  async function cargarDatosDesdeSupabase() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) { overlay.style.display = 'flex'; }
+    const { data: atletasData } = await _sb.from('atletas').select('*').order('created_at', { ascending: true });
+    dbAlumnos = (atletasData || []).map(a => ({ id: a.id, nombre: a.nombre, edad: a.edad, deporte: a.deporte, experiencia: a.experiencia, lesiones: a.lesiones, pin: a.pin }));
+
+    const { data: planes } = await _sb.from('planificaciones').select('*, atletas(nombre)').order('created_at', { ascending: true });
+    dbPlanificaciones = {};
+    (planes || []).forEach(p => {
+      const n = p.atletas?.nombre;
+      if (n && p.estructura) {
+        if (!dbPlanificaciones[n]) dbPlanificaciones[n] = {};
+        const periodo = p.periodo || 'Plan General';
+        // El payload guardado es { mesociclo: {...}, estructura: {...exercises...} }
+        // Desempaquetamos correctamente para no anidar un nivel de más
+        const stored    = p.estructura;
+        const mesociclo = stored.mesociclo || { s1:'Media', s2:'Alta', s3:'Impacto', s4:'Descarga' };
+        const ejercicios = stored.estructura || stored; // estructura interna o el objeto directo
+        dbPlanificaciones[n][periodo] = { estructura: ejercicios, mesociclo, activo: p.activo };
+        if (p.activo || !periodoActualPorAtleta[n]) periodoActualPorAtleta[n] = periodo;
+      }
+    });
+
+    const { data: evals } = await _sb.from('evaluaciones').select('*, atletas(nombre)').order('created_at', { ascending: true });
+    dbEvaluaciones = {};
+    (evals || []).forEach(e => {
+      const n = e.atletas?.nombre;
+      if (n) { if (!dbEvaluaciones[n]) dbEvaluaciones[n] = []; dbEvaluaciones[n].push({ fecha: e.fecha, tipo: e.tipo, gesto: e.gesto, metricas: e.metricas, diagnostico: e.diagnostico }); }
+    });
+
+    const { data: asist } = await _sb.from('asistencias').select('*, atletas(nombre)');
+    dbAsistencias = {};
+    (asist || []).forEach(a => {
+      const n = a.atletas?.nombre;
+      if (n) {
+        if (!dbAsistencias[n]) dbAsistencias[n] = {};
+        const [y, m, d] = a.fecha.split('-');
+        dbAsistencias[n][`${parseInt(y)}-${parseInt(m)}-${parseInt(d)}`] = { asistido: a.presente, rpe: a.rpe, notas: a.notas || '' };
+      }
+    });
+
+    const { data: func } = await _sb.from('funcionales').select('*, atletas(nombre)').order('created_at', { ascending: false });
+    dbFuncionales = {};
+    (func || []).forEach(f => { const n = f.atletas?.nombre; if (n && f.datos_fms && !dbFuncionales[n]) dbFuncionales[n] = f.datos_fms; });
+
+    syncLocalStorage();
+                                            if (overlay) { overlay.style.display = 'none'; }
+  }
+
+  // ─── HELPERS DE ESCRITURA EN SUPABASE ─────────────────────────────────────
+  async function sbGuardarEvaluacion(nombre, evalObj) {
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (!atleta?.id) return;
+    await _sb.from('evaluaciones').insert({ atleta_id: atleta.id, fecha: new Date().toISOString().split('T')[0], tipo: evalObj.tipo, gesto: evalObj.gesto, metricas: evalObj.metricas, diagnostico: evalObj.diagnostico });
+  }
+
+  async function sbGuardarPlan(nombre, estructura, periodo) {
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (!atleta?.id) return { error: { message: 'Atleta no encontrado' } };
+    const per = periodo || periodoActualPorAtleta[nombre] || 'Plan General';
+    return await _sb.from('planificaciones').upsert(
+      { atleta_id: atleta.id, estructura, periodo: per },
+      { onConflict: 'atleta_id,periodo' }
+    );
+  }
+
+  async function sbGuardarFuncional(nombre, datosFms) {
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (!atleta?.id) return;
+    await _sb.from('funcionales').upsert({ atleta_id: atleta.id, datos_fms: datosFms }, { onConflict: 'atleta_id' });
+  }
+
+  async function sbGuardarAsistencia(nombre, fechaKey, asistObj) {
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (!atleta?.id) return;
+    const [y, m, d] = fechaKey.split('-');
+    const fechaISO = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    await _sb.from('asistencias').upsert({ atleta_id: atleta.id, fecha: fechaISO, presente: asistObj.asistido, rpe: parseInt(asistObj.rpe) || null, notas: asistObj.notas || '' }, { onConflict: 'atleta_id,fecha' });
+  }
+
+  // --- TRANSICIÓN DE BIENVENIDA A LOGIN ---
+  function ingresarFlujoLogin() {
+    const welcome = document.getElementById('welcome-screen');
+    welcome.style.opacity = '0';
+    setTimeout(() => { welcome.style.display = 'none'; }, 500);
+  }
+
+  // AUTENTICACIÓN CONTROL
+  async function ejecutarAutenticacionFiltro(e) {
+    e.preventDefault();
+    const input = document.getElementById('login-user').value.trim();
+    const pass  = document.getElementById('login-pass').value.trim();
+    const body  = document.body;
+    const btn   = e.submitter;
+    if (btn) { btn.disabled = true; btn.innerText = 'Verificando...'; }
+
+    // ── COACH: login con email via Supabase Auth ──────────────────────────
+    if (input.includes('@')) {
+      const { data, error } = await _sb.auth.signInWithPassword({ email: input, password: pass });
+      if (error || !data.user) {
+        alert('Email o contraseña incorrectos.');
+        if (btn) { btn.disabled = false; btn.innerText = 'Acceder al Sistema'; }
+        return;
+      }
+      coachUserId = data.user.id;
+      usuarioLogueadoActual = "Franco Flores";
+      body.classList.remove('mode-alumno'); body.classList.add('mode-coach');
+      document.getElementById('role-display-status').innerText = "👑 ENTORNO DE TRABAJO: ENTRENADOR DE ALTO RENDIMIENTO";
+      document.getElementById('label-user-logged').innerText   = "Profesor: Franco Flores";
+      document.getElementById('app-login-screen').style.display = 'none';
+      await cargarDatosDesdeSupabase();
+      actualizarEntornoDeDatos();
+      renderAlumnosTable();
+      poblarSelectorCargas();
+      poblarSelectorBiblioteca();
+      cargarVideosBiblioteca();
+      switchView('dashboard');
+
+    // ── ATLETA: siempre carga datos frescos desde Supabase ──────────────
+    } else {
+      // Primero identificamos al atleta y recién después validamos su PIN
+      // propio — antes se validaba una única contraseña compartida por
+      // todos, lo que permitía entrar al panel de cualquier atleta con
+      // solo saber su nombre. Ahora cada uno tiene su propio PIN.
+      try {
+        const { data: atletasRemoto } = await _sb.from('atletas').select('*');
+        if (atletasRemoto && atletasRemoto.length > 0) {
+          dbAlumnos = atletasRemoto.map(a => ({ id: a.id, nombre: a.nombre, edad: a.edad, deporte: a.deporte, experiencia: a.experiencia, lesiones: a.lesiones, pin: a.pin }));
+          await cargarDatosDesdeSupabase();
+        } else {
+          cargarCacheLocal();
+        }
+      } catch(e) { cargarCacheLocal(); }
+      const atletaExiste = dbAlumnos.find(a => a.nombre.toLowerCase() === input.toLowerCase());
+      // Mismo mensaje de error tanto si el nombre no existe como si el PIN
+      // está mal, para no darle pistas a quien intenta adivinar nombres.
+      // Compatibilidad: si un atleta viejo todavía no tiene PIN individual
+      // asignado (migración), se acepta la contraseña compartida anterior
+      // como último recurso — hay que asignarle un PIN cuanto antes desde
+      // "Gestión y Alta de Deportistas".
+      const pinValido = atletaExiste && (atletaExiste.pin ? pass === atletaExiste.pin : pass === "atleta2026");
+      if (!atletaExiste || !pinValido) {
+        alert("Credenciales incorrectas.");
+        if (btn) { btn.disabled = false; btn.innerText = 'Acceder al Sistema'; }
+        return;
+      }
+      usuarioLogueadoActual = atletaExiste.nombre;
+      document.querySelectorAll('.coach-only-ui').forEach(el => el.style.removeProperty('display'));
+      body.classList.remove('mode-coach'); body.classList.add('mode-alumno');
+      document.getElementById('role-display-status').innerText = `🔒 PANEL PRIVADO DEL ATLETA: ${usuarioLogueadoActual.toUpperCase()}`;
+      document.getElementById('label-user-logged').innerText   = `Atleta: ${usuarioLogueadoActual}`;
+      document.getElementById('plan-alumno-assigned').value    = usuarioLogueadoActual;
+      document.getElementById('eval-alumno-select').value      = usuarioLogueadoActual;
+      document.getElementById('eval-selector-box-container').style.display = 'none';
+      document.getElementById('app-login-screen').style.display = 'none';
+      cargarPlanDeAtletaSeleccionado();
+      cambiarAtletaEvaluacion();
+      buildCurrentMonthCalendar();
+      renderAthleteEvalView();
+      renderCargasView();
+      document.getElementById('plan-section-title').innerText = `Tu Cuadro de Cargas y Planificación de Entrenamiento`;
+      switchView('planificaciones');
+    }
+    if (btn) { btn.disabled = false; btn.innerText = 'Acceder al Sistema'; }
+  }
+
+  async function cerrarSesionPlataforma() {
+    await _sb.auth.signOut();
+    coachUserId = null;
+    usuarioLogueadoActual = "";
+    // Borramos el caché local: en una compu o celular compartido (recepción
+    // del club, dispositivo prestado a un atleta, etc.) no debe quedar
+    // información de otros atletas disponible después de cerrar sesión.
+    localStorage.removeItem('FF_dbAlumnos');
+    localStorage.removeItem('FF_dbPlanificaciones');
+    localStorage.removeItem('FF_dbEvaluaciones');
+    localStorage.removeItem('FF_dbAsistencias');
+    localStorage.removeItem('FF_dbFuncionales');
+    dbAlumnos = []; dbPlanificaciones = {}; dbEvaluaciones = {}; dbAsistencias = {}; dbFuncionales = {};
+    document.getElementById('login-user').value = "";
+    document.getElementById('login-pass').value = "";
+    document.body.classList.remove('mode-coach', 'mode-alumno');
+    document.querySelectorAll('.coach-only-ui').forEach(el => el.style.removeProperty('display'));
+    document.querySelectorAll('.nav-menu .nav-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('role-display-status').innerText = '🔐 SESIÓN NO INICIADA';
+    document.getElementById('label-user-logged').innerText   = '';
+    document.getElementById('app-login-screen').style.display = 'flex';
+  }
+
+  // ALTA ATLETAS
+  async function saveAlumno(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('al-nombre').value.trim();
+    if (dbAlumnos.some(a => a.nombre.toLowerCase() === nombre.toLowerCase())) { alert("El atleta ya existe."); return; }
+
+    const nuevoAlumno = { nombre, edad: document.getElementById('al-edad').value, deporte: document.getElementById('al-deporte').value, experiencia: document.getElementById('al-experiencia').value, lesiones: document.getElementById('al-lesiones').value, pin: document.getElementById('al-pin').value.trim() };
+    if (!/^\d{4,6}$/.test(nuevoAlumno.pin)) { alert('El PIN debe tener entre 4 y 6 números.'); return; }
+
+    const { data: guardado, error } = await _sb.from('atletas').insert({ coach_id: coachUserId, nombre: nuevoAlumno.nombre, edad: parseInt(nuevoAlumno.edad) || null, deporte: nuevoAlumno.deporte, experiencia: nuevoAlumno.experiencia, lesiones: nuevoAlumno.lesiones, pin: nuevoAlumno.pin }).select().single();
+    if (error) { alert('Error al guardar: ' + error.message); return; }
+    nuevoAlumno.id = guardado.id;
+    dbAlumnos.push(nuevoAlumno);
+
+    dbEvaluaciones[nombre] = [];
+    dbAsistencias[nombre]  = {};
+    const funcInicial = { ohs:3, sls_i:3, sls_d:3, thomas_i:3, thomas_d:3, rot_int_i:3, rot_int_d:3, rot_ext_i:3, rot_ext_d:3, wells:3, isq_i:5, isq_d:5, lunge_i:3, lunge_d:3, homb_int_i:3, homb_int_d:3, homb_ext_i:3, homb_ext_d:3 };
+    dbFuncionales[nombre]  = funcInicial;
+    const planInicial = { mesociclo: { s1:'Media', s2:'Alta', s3:'Impacto', s4:'Descarga' }, estructura: { 'd1-movilidad':[], 'd1-core':[], 'd1-fuerza':[], 'd2-movilidad':[], 'd2-core':[], 'd2-fuerza':[], 'd3-movilidad':[], 'd3-core':[], 'd3-fuerza':[] } };
+    dbPlanificaciones[nombre] = planInicial;
+
+    await sbGuardarPlan(nombre, planInicial);
+    await sbGuardarFuncional(nombre, funcInicial);
+    syncLocalStorage();
+    actualizarEntornoDeDatos();
+    renderAlumnosTable();
+    document.getElementById('form-alumno').reset();
+    alert(`✅ Ficha de ${nombre} creada y sincronizada con la nube.`);
+  }
+
+  async function eliminarAlumno(nombre) {
+    // Antes alcanzaba con un clic + "Aceptar" en el diálogo del navegador,
+    // muy fácil de tocar sin querer (sobre todo al lado de otros botones
+    // de la misma fila). Ahora hay que escribir el nombre exacto del
+    // atleta para confirmar — así una acción irreversible no depende de
+    // un solo clic apurado.
+    const confirmacion = prompt(`Esta acción borra a "${nombre}" y TODOS sus planes, evaluaciones y datos de forma permanente.\n\nEscribí el nombre exacto del atleta para confirmar:`);
+    if (confirmacion === null) return;
+    if (confirmacion.trim().toLowerCase() !== nombre.trim().toLowerCase()) {
+      alert('El nombre no coincide. No se borró nada.');
+      return;
+    }
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (atleta?.id) {
+      const { error } = await _sb.from('atletas').delete().eq('id', atleta.id);
+      if (error) { alert('Error al eliminar: ' + error.message); return; }
+    }
+    dbAlumnos = dbAlumnos.filter(a => a.nombre !== nombre);
+    delete dbPlanificaciones[nombre]; delete dbEvaluaciones[nombre];
+    delete dbAsistencias[nombre];     delete dbFuncionales[nombre];
+    syncLocalStorage();
+    actualizarEntornoDeDatos();
+    renderAlumnosTable();
+  }
+
+  // ─── PIN INDIVIDUAL POR ATLETA ──────────────────────────────────────────
+  // Reemplaza la contraseña única compartida por un PIN propio de cada
+  // deportista, para que nadie pueda entrar al panel de otro atleta
+  // simplemente escribiendo su nombre.
+  async function cambiarPinAtleta(nombre) {
+    const atleta = dbAlumnos.find(a => a.nombre === nombre);
+    if (!atleta?.id) return;
+    const nuevoPin = prompt(`Nuevo PIN de acceso para ${nombre} (4 a 6 dígitos):`, '');
+    if (nuevoPin === null) return;
+    if (!/^\d{4,6}$/.test(nuevoPin.trim())) { alert('El PIN debe tener entre 4 y 6 números.'); return; }
+    const { error } = await _sb.from('atletas').update({ pin: nuevoPin.trim() }).eq('id', atleta.id);
+    if (error) { alert('Error al guardar el PIN: ' + error.message); return; }
+    atleta.pin = nuevoPin.trim();
+    renderAlumnosTable();
+    alert(`✅ PIN actualizado para ${nombre}. Comunicáselo por un canal seguro (no por el mismo lugar donde comparten el plan).`);
+  }
+
+  function actualizarEntornoDeDatos() {
+    const hasData = dbAlumnos.length > 0;
+    
+    document.getElementById('plan-view-error').style.display = hasData ? 'none' : 'block';
+    document.getElementById('plan-view-content').style.display = hasData ? 'block' : 'none';
+    document.getElementById('eval-view-error').style.display = hasData ? 'none' : 'block';
+    // Coach ve el panel de lab completo; atleta ve su panel personal
+    const esAlumno = document.body.classList.contains('mode-alumno');
+    document.getElementById('eval-athlete-panel').style.display = (hasData && esAlumno) ? 'block' : 'none';
+    document.getElementById('eval-view-content').style.display = (hasData && !esAlumno) ? 'block' : 'none';
+    document.getElementById('cal-view-error').style.display = hasData ? 'none' : 'block';
+    document.getElementById('cal-view-content').style.display = hasData ? 'block' : 'none';
+
+    const sPlan = document.getElementById('plan-alumno-assigned');
+    const sEval = document.getElementById('eval-alumno-select');
+    sPlan.innerHTML = ''; sEval.innerHTML = '';
+
+    dbAlumnos.forEach(al => {
+      sPlan.innerHTML += `<option value="${escapeHtml(al.nombre)}">${escapeHtml(al.nombre)}</option>`;
+      sEval.innerHTML += `<option value="${escapeHtml(al.nombre)}">${escapeHtml(al.nombre)}</option>`;
+    });
+
+    if(hasData) {
+      if(document.body.classList.contains('mode-alumno')) {
+        document.getElementById('plan-alumno-assigned').value = usuarioLogueadoActual;
+        document.getElementById('eval-alumno-select').value = usuarioLogueadoActual;
+      }
+      cargarPlanDeAtletaSeleccionado();
+      cambiarAtletaEvaluacion();
+      renderDashboardAnalytics();
+      buildCurrentMonthCalendar();
+    } else {
+      if(globalChartInstance) { globalChartInstance.destroy(); globalChartInstance = null; }
+      document.getElementById('dash-chart-placeholder').style.display = 'block';
+      document.getElementById('chartAsistencia').style.display = 'none';
+    }
+  }
+
+  function renderAlumnosTable() {
+    const tbody = document.getElementById('tabla-alumnos');
+    if (dbAlumnos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Base de datos vacía.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = dbAlumnos.map(al => `
+      <tr>
+        <td><b title="Doble clic para subir estudio médico" style="cursor:pointer;" ondblclick='abrirSelectorEstudio(${JSON.stringify(al.nombre)})'>${escapeHtml(al.nombre)} 📎</b></td>
+        <td>${escapeHtml(al.edad)} años</td>
+        <td>${escapeHtml(al.deporte)}</td>
+        <td>${escapeHtml(al.experiencia)}</td>
+        <td>${escapeHtml(al.lesiones) || 'Ninguna'}</td>
+        <td style="text-align:right;">
+          <button style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer; margin-right:16px;" onclick='cambiarPinAtleta(${JSON.stringify(al.nombre)})'>${al.pin ? "🔑 PIN" : "⚠️ Sin PIN"}</button>
+          <button class="btn-table-delete" onclick='eliminarAlumno(${JSON.stringify(al.nombre)})'>Eliminar</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ─── EXPEDIENTE MÉDICO — DOBLE CLIC ──────────────────────────────────────
+  let _atletaEstudioActual = null;
+
+  function abrirSelectorEstudio(nombre) {
+    _atletaEstudioActual = nombre;
+    const input = document.getElementById('doc-file-input');
+    input.value = '';
+    input.click();
+  }
+
+  async function subirDocumentoMedico(input) {
+    if (!input.files.length || !_atletaEstudioActual) return;
+    const file   = input.files[0];
+    const atleta = dbAlumnos.find(a => a.nombre === _atletaEstudioActual);
+    if (!atleta?.id) return;
+
+    const status = document.getElementById('doc-upload-status');
+    status.style.display = 'block';
+    status.innerText = `⏳ Subiendo estudio para ${_atletaEstudioActual}...`;
+
+    const path = `${atleta.id}/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+    const tipo = file.name.split('.').pop().toUpperCase();
+
+    const { error } = await _sb.storage.from('documentos-medicos').upload(path, file);
+    if (error) { status.innerText = '❌ Error: ' + error.message; return; }
+
+    await _sb.from('documentos_medicos').insert({
+      atleta_id:    atleta.id,
+      nombre:       file.name,
+      descripcion:  file.name,
+      tipo,
+      storage_path: path
+    });
+
+    status.innerText = `✅ Estudio de ${_atletaEstudioActual} subido correctamente`;
+    setTimeout(() => { status.style.display = 'none'; }, 3000);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // PLANIFICACIÓN MODULAR AISLADA
+  function renderPlanDaysUI() {
+    const contenedor = document.getElementById('plan-days-container');
+    contenedor.innerHTML = '';
+    for (let i = 1; i <= totalDiasPlan; i++) {
+      contenedor.innerHTML += `
+        <div class="plan-column-day ${i === 1 ? 'day-open' : ''}" id="col-day-d${i}">
+          <div class="day-header" onclick="toggleDayAccordion(this)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDayAccordion(this);}" aria-expanded="${i === 1 ? 'true' : 'false'}">
+            <span>DÍA ${i}</span>
+            <span class="day-chevron">⌄</span>
+          </div>
+          <div class="day-body" id="day-body-d${i}">
+          <div class="block-section">
+            <div class="block-title">
+              <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' style='width:13px;height:13px;vertical-align:middle;margin-right:5px;position:relative;top:-1px;'><circle cx='7' cy='2' r='1.3'/><path d='M5 5.5c1.5-2 4-1.5 4 .5'/><path d='M5.5 6.5L4 11'/><path d='M8.5 6.5L10 11'/><line x1='3.5' y1='11.5' x2='10.5' y2='11.5'/></svg>
+              Movilidad Funcional
+            </div>
+            <div id="container-d${i}-movilidad"></div>
+            <button class="btn btn-secondary" onclick="addExerciseRow('d${i}-movilidad')">＋ Ejercicio</button>
+          </div>
+          <div class="block-section">
+            <div class="block-title" style="border-left-color:var(--accent-green)">
+              <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.3' stroke-linecap='round' style='width:13px;height:13px;vertical-align:middle;margin-right:5px;position:relative;top:-1px;'><circle cx='7' cy='7' r='5.5'/><circle cx='7' cy='7' r='3'/><circle cx='7' cy='7' r='0.9' fill='currentColor' stroke='none'/></svg>
+              Core / Correctivo
+            </div>
+            <div id="container-d${i}-core"></div>
+            <button class="btn btn-secondary" onclick="addExerciseRow('d${i}-core')">＋ Ejercicio</button>
+          </div>
+          <div class="block-section">
+            <div class="block-title" style="border-left-color:var(--accent-red)">
+              <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.3' stroke-linecap='round' style='width:13px;height:13px;vertical-align:middle;margin-right:5px;position:relative;top:-1px;'><line x1='1.5' y1='7' x2='12.5' y2='7'/><rect x='0' y='5' width='2.5' height='4' rx='0.4' fill='currentColor' stroke='none'/><rect x='2.5' y='4' width='1.5' height='6' rx='0.3' fill='currentColor' stroke='none'/><rect x='10' y='5' width='2.5' height='4' rx='0.4' fill='currentColor' stroke='none'/><rect x='10' y='4' width='1.5' height='6' rx='0.3' fill='currentColor' stroke='none'/></svg>
+              Carga Principal de Fuerza
+            </div>
+            <div id="container-d${i}-fuerza"></div>
+            <button class="btn btn-secondary" onclick="addExerciseRow('d${i}-fuerza')">＋ Ejercicio</button>
+          </div>
+          </div>
+        </div>`;
+    }
+  }
+
+  // ─── ACORDEÓN DE DÍAS (solo tiene efecto visual en mobile, <=768px) ───────
+  // En desktop/tablet el CSS mantiene .day-body siempre visible, así que
+  // esta función no rompe nada de la vista actual en pantallas grandes.
+  function toggleDayAccordion(headerEl) {
+    const dia = headerEl.closest('.plan-column-day');
+    if (!dia) return;
+    const yaAbierto = dia.classList.contains('day-open');
+
+    // Un solo día abierto a la vez: cerramos los demás
+    document.querySelectorAll('#plan-days-container .plan-column-day.day-open').forEach(d => {
+      if (d !== dia) {
+        d.classList.remove('day-open');
+        const h = d.querySelector('.day-header');
+        if (h) h.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    dia.classList.toggle('day-open', !yaAbierto);
+    headerEl.setAttribute('aria-expanded', String(!yaAbierto));
+  }
+
+  function addPlanDay() {
+    // E2 — Eliminado el renderPlanDaysUI() inicial: cargarPlanDeAtletaSeleccionado() ya lo invoca internamente
+    totalDiasPlan++;
+    const atleta = document.getElementById('plan-alumno-assigned').value;
+    const periodo = periodoActualPorAtleta[atleta] || 'Plan General';
+    // Antes esto apuntaba a dbPlanificaciones[atleta].estructura directamente,
+    // pero cada plan vive un nivel más adentro: dbPlanificaciones[atleta][periodo].estructura.
+    // Esa referencia inexistente cortaba la ejecución apenas se apretaba el botón,
+    // por eso nunca se agregaba ningún día nuevo.
+    if (atleta) {
+      if (!dbPlanificaciones[atleta]) dbPlanificaciones[atleta] = {};
+      if (!dbPlanificaciones[atleta][periodo]) dbPlanificaciones[atleta][periodo] = { mesociclo: {}, estructura: {}, activo: true };
+      dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-movilidad`] = [];
+      dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-core`] = [];
+      dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-fuerza`] = [];
+      cargarPlanDeAtletaSeleccionado();
+    } else {
+      renderPlanDaysUI();
+    }
+  }
+
+  function removeLastPlanDay() {
+    if(totalDiasPlan <= 1) return;
+    const atleta = document.getElementById('plan-alumno-assigned').value;
+    const periodo = periodoActualPorAtleta[atleta] || 'Plan General';
+    if(atleta && dbPlanificaciones[atleta]?.[periodo]) {
+      delete dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-movilidad`];
+      delete dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-core`];
+      delete dbPlanificaciones[atleta][periodo].estructura[`d${totalDiasPlan}-fuerza`];
+    }
+    totalDiasPlan--; renderPlanDaysUI(); cargarPlanDeAtletaSeleccionado();
+  }
+
+  // ─── AUTOCOMPLETADO DE EJERCICIOS ──────────────────────────────────────────
+  let _acTimer = null;
+
+  async function buscarEjercicioAC(input) {
+    const q = input.value.trim();
+    cerrarDropdownAC(input);
+    if (q.length < 2) return;
+
+    clearTimeout(_acTimer);
+    _acTimer = setTimeout(async () => {
+      const { data } = await _sb.from('ejercicios_videos')
+        .select('nombre, categoria')
+        .ilike('nombre_busqueda', `%${q.toLowerCase()}%`)
+        .limit(7);
+
+      if (!data?.length) return;
+
+      const wrap = input.closest('.autocomplete-wrap');
+      const list = document.createElement('div');
+      list.className = 'autocomplete-list';
+      list.id = 'ac-list-' + Math.random().toString(36).slice(2);
+
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.innerHTML = `${escapeHtml(item.nombre)}<span>${escapeHtml(item.categoria || '')}</span>`;
+        div.onmousedown = () => {
+          input.value = item.nombre;
+          cerrarDropdownAC(input);
+          // Disparar autoguardado si hay kg
+          const row = input.closest('.exercise-row-input');
+          if (row) {
+            const kgInput = row.querySelector('.ex-kg-real');
+            if (kgInput && kgInput.value) debounceSaveKg(kgInput);
+          }
+        };
+        list.appendChild(div);
+      });
+
+      wrap.appendChild(list);
+    }, 280);
+  }
+
+  function cerrarDropdownAC(input) {
+    const wrap = input.closest('.autocomplete-wrap');
+    if (wrap) { const old = wrap.querySelector('.autocomplete-list'); if (old) old.remove(); }
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
+  function addExerciseRow(containerId, valores = {e: '', rp: '', s: '', c: '', kr: '', id: null}) {
+    const container = document.getElementById(`container-${containerId}`);
+    if(!container) return;
+    const esAlumno = document.body.classList.contains('mode-alumno');
+    // Identidad propia y fija del ejercicio: se genera una sola vez (al
+    // crearlo) y de ahí en adelante viaja guardada junto a sus datos. Antes
+    // se recalculaba según la posición en la lista, lo que desalineaba el
+    // historial de "Kg Real" apenas se reordenaba, borraba o insertaba un
+    // ejercicio en el medio.
+    const bloqueKey = valores.id || `${containerId}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+
+    const row = document.createElement('div');
+    row.className = 'exercise-row-input';
+    row.dataset.bloqueKey = bloqueKey;
+    row.innerHTML = `
+      <div class="autocomplete-wrap" style="grid-column:1">
+        <input type="text" placeholder="Ejercicio" class="ex-name" value="${escapeHtml(valores.e || '')}" oninput="buscarEjercicioAC(this)" onblur="setTimeout(()=>cerrarDropdownAC(this),200)" autocomplete="off">
+      </div>
+      <input type="text" placeholder="Rep" class="ex-repplan" value="${escapeHtml(valores.rp || '')}">
+      <input type="text" placeholder="Ser" class="ex-series" value="${escapeHtml(valores.s || '')}">
+      <input type="text" placeholder="Kg Plan" class="ex-carga ex-carga-alumno" value="${escapeHtml(valores.c || '')}">
+      <input type="text" placeholder="Kg Real" class="ex-kg-real" value="${escapeHtml(valores.kr || '')}" oninput="debounceSaveKg(this)">
+      <button class="btn-video-trigger" onclick="toggleVideoInline(this)">▶</button>
+      <button class="btn-row-delete" onclick="this.parentElement.remove()">✕</button>
+    `;
+    container.appendChild(row);
+
+    if(esAlumno) {
+      row.querySelector('.ex-name').classList.add('ex-disabled-alumno');
+      row.querySelector('.ex-repplan').classList.add('ex-disabled-alumno');
+      row.querySelector('.ex-series').classList.add('ex-disabled-alumno');
+      row.querySelector('.ex-carga').classList.add('ex-disabled-alumno');
+    } else {
+      // Coach: campo kg real readonly (ver lo que ejecutó el atleta)
+      const kgRealInput = row.querySelector('.ex-kg-real');
+      kgRealInput.classList.add('ex-kg-real-coach');
+      kgRealInput.placeholder = 'Kg ejecutado';
+      kgRealInput.removeAttribute('oninput');
+    }
+  }
+
+  function cargarPlanDeAtletaSeleccionado() {
+    let atleta = document.getElementById('plan-alumno-assigned').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if (!atleta || !dbPlanificaciones[atleta]) return;
+
+    // Actualizar selector de períodos
+    const selPeriodo = document.getElementById('plan-periodo-select');
+    if (selPeriodo) {
+      selPeriodo.innerHTML = '';
+      Object.keys(dbPlanificaciones[atleta]).forEach(per => {
+        const opt = document.createElement('option');
+        opt.value = per; opt.textContent = per;
+        if (per === periodoActualPorAtleta[atleta]) opt.selected = true;
+        selPeriodo.appendChild(opt);
+      });
+      // Badge activo
+      const badge = document.getElementById('plan-periodo-badge');
+      const periodoData = dbPlanificaciones[atleta][periodoActualPorAtleta[atleta]];
+      if (badge) { badge.textContent = periodoData?.activo ? 'ACTIVO' : 'HISTORIAL'; badge.className = periodoData?.activo ? 'badge badge-success' : 'badge badge-warning'; }
+    }
+
+    const periodo = periodoActualPorAtleta[atleta] || Object.keys(dbPlanificaciones[atleta])[0];
+    const planData = dbPlanificaciones[atleta][periodo];
+    if (!planData) return;
+
+    const plan = { mesociclo: planData.mesociclo || { s1:'Media', s2:'Alta', s3:'Impacto', s4:'Descarga' }, estructura: planData.estructura || planData };
+
+    document.getElementById('meso-s1').value = plan.mesociclo.s1 || '';
+    document.getElementById('meso-s2').value = plan.mesociclo.s2 || '';
+    document.getElementById('meso-s3').value = plan.mesociclo.s3 || '';
+    document.getElementById('meso-s4').value = plan.mesociclo.s4 || '';
+    document.querySelectorAll('.info-s1').forEach(el => el.innerText = plan.mesociclo.s1 || '');
+    document.querySelectorAll('.info-s2').forEach(el => el.innerText = plan.mesociclo.s2 || '');
+    document.querySelectorAll('.info-s3').forEach(el => el.innerText = plan.mesociclo.s3 || '');
+    document.querySelectorAll('.info-s4').forEach(el => el.innerText = plan.mesociclo.s4 || '');
+
+    let maxDia = 3;
+    Object.keys(plan.estructura).forEach(k => {
+      const match = k.match(/d(\d+)-/);
+      if(match) { const d = parseInt(match[1]); if(d > maxDia) maxDia = d; }
+    });
+    totalDiasPlan = maxDia;
+    renderPlanDaysUI();
+    Object.keys(plan.estructura).forEach(b => {
+      const c = document.getElementById(`container-${b}`);
+      if(c && plan.estructura[b]) { c.innerHTML = ''; plan.estructura[b].forEach(ex => { addExerciseRow(b, ex); }); }
+    });
+
+    // Cargar kg ejecutados de hoy para el atleta seleccionado
+    const atletaKg = document.body.classList.contains('mode-alumno') ? usuarioLogueadoActual : document.getElementById('plan-alumno-assigned').value;
+    cargarKgsEjecutados(atletaKg);
+  }
+
+  // ─── KG EJECUTADO POR ATLETA ────────────────────────────────────────────────
+  let _kgDebounceTimers = {};
+
+  function debounceSaveKg(input) {
+    const row = input.closest('.exercise-row-input');
+    const key = row.dataset.bloqueKey;
+    if (!key) return;
+    clearTimeout(_kgDebounceTimers[key]);
+    _kgDebounceTimers[key] = setTimeout(() => sbGuardarKgEjecutado(input, key), 700);
+  }
+
+  async function sbGuardarKgEjecutado(input, bloqueKey) {
+    const atleta = dbAlumnos.find(a => a.nombre === usuarioLogueadoActual);
+    if (!atleta?.id) return;
+    const periodo   = periodoActualPorAtleta[usuarioLogueadoActual] || 'Plan General';
+    const hoy       = new Date().toISOString().split('T')[0];
+    const row       = input.closest('.exercise-row-input');
+    const ejercicio = row.querySelector('.ex-name')?.value || '';
+    const kgVal     = input.value.trim();
+
+    await _sb.from('sesiones_ejecutadas').upsert({
+      atleta_id:    atleta.id,
+      periodo,
+      fecha:        hoy,
+      bloque_key:   bloqueKey,
+      ejercicio,
+      kg_ejecutado: kgVal
+    }, { onConflict: 'atleta_id,periodo,fecha,bloque_key' });
+
+    // Feedback visual: borde verde brillante momentáneo
+    input.style.borderColor = 'var(--accent-green)';
+    input.style.boxShadow   = '0 0 0 2px rgba(44,242,144,0.3)';
+    setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 1000);
+  }
+
+  // ─── SECCIÓN CARGAS (historial completo, coach y atleta) ───────────────────
+  function poblarSelectorCargas() {
+    const sel = document.getElementById('cargas-alumno');
+    if (!sel) return;
+    sel.innerHTML = dbAlumnos.map(a => `<option value="${escapeHtml(a.nombre)}">${escapeHtml(a.nombre)}</option>`).join('');
+  }
+
+  function setCargasTab(tab) {
+    const esSesion = tab === 'sesion';
+    document.getElementById('cargas-tab-sesion').classList.toggle('active', esSesion);
+    document.getElementById('cargas-tab-ejercicio').classList.toggle('active', !esSesion);
+    document.getElementById('cargas-sesion-view').style.display = esSesion ? 'block' : 'none';
+    document.getElementById('cargas-ejercicio-view').style.display = esSesion ? 'none' : 'block';
+  }
+
+  async function renderCargasView() {
+    let atleta = document.getElementById('cargas-alumno')?.value;
+    if (document.body.classList.contains('mode-alumno')) atleta = usuarioLogueadoActual;
+    const vacio = document.getElementById('cargas-vacio');
+    const statsEl = document.getElementById('cargas-stats');
+    const vSesion = document.getElementById('cargas-sesion-view');
+    if (!atleta) { vacio.style.display = 'block'; statsEl.innerHTML = ''; vSesion.innerHTML = ''; return; }
+    const atl = dbAlumnos.find(a => a.nombre === atleta);
+    if (!atl?.id) return;
+    vacio.style.display = 'none';
+    vSesion.innerHTML = '<p style="color:var(--text-muted);">Cargando…</p>';
+
+    const [{ data: cargas, error: errC }, { data: asis }] = await Promise.all([
+      _sb.from('sesiones_ejecutadas').select('fecha, ejercicio, kg_ejecutado').eq('atleta_id', atl.id).order('fecha', { ascending: true }),
+      _sb.from('asistencias').select('fecha, rpe').eq('atleta_id', atl.id)
+    ]);
+    if (errC) { vSesion.innerHTML = `<p style="color:var(--accent-red);">Error al cargar: ${escapeHtml(errC.message)}</p>`; return; }
+
+    const rpeMap = {};
+    (asis || []).forEach(a => { if (a.rpe) rpeMap[a.fecha] = a.rpe; });
+
+    const registros = (cargas || []).filter(c => c.kg_ejecutado && (c.ejercicio || '').trim());
+    const ultimoPorEjercicio = {};
+    const sesionesPorFecha = {};
+    registros.forEach(r => {
+      const nombreEx = r.ejercicio.trim();
+      const prev = ultimoPorEjercicio[nombreEx];
+      const kgNum = parseFloat(r.kg_ejecutado);
+      const delta = (prev !== undefined && !isNaN(kgNum)) ? kgNum - prev.kg : null;
+      (sesionesPorFecha[r.fecha] = sesionesPorFecha[r.fecha] || []).push({ ejercicio: nombreEx, kg: r.kg_ejecutado, delta, prevRpe: prev ? rpeMap[prev.fecha] : null });
+      if (!isNaN(kgNum)) ultimoPorEjercicio[nombreEx] = { kg: kgNum, fecha: r.fecha };
+    });
+
+    const fechas = Object.keys(sesionesPorFecha).sort().reverse();
+    const ejerciciosUnicos = Object.keys(ultimoPorEjercicio).length;
+    const marcasNuevas = fechas[0] ? sesionesPorFecha[fechas[0]].filter(x => x.delta > 0).length : 0;
+
+    statsEl.innerHTML = `
+      <div class="metric-card"><div class="metric-label">Ejercicios</div><div style="font-size:22px;font-weight:700;">${ejerciciosUnicos}</div></div>
+      <div class="metric-card"><div class="metric-label">Sesiones</div><div style="font-size:22px;font-weight:700;">${fechas.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Marcas Nuevas (última sesión)</div><div style="font-size:22px;font-weight:700;color:var(--accent-green);">${marcasNuevas}</div></div>`;
+
+    if (!fechas.length) {
+      vSesion.innerHTML = '<div class="no-data-msg">Todavía no hay cargas registradas.</div>';
+      document.getElementById('cargas-ex-chips').innerHTML = '';
+      window._cargasEjData = {};
+      return;
+    }
+
+    vSesion.innerHTML = fechas.map(f => {
+      const rpe = rpeMap[f];
+      let badge = '<span class="badge badge-info">Sin RPE cargado</span>';
+      if (rpe) {
+        const cls = rpe <= 11 ? 'badge-success' : (rpe <= 15 ? 'badge-info' : 'badge-warning');
+        const txt = rpe <= 11 ? 'Liviano' : (rpe <= 15 ? 'Moderado' : 'Duro');
+        badge = `<span class="badge ${cls}">RPE ${escapeHtml(rpe)} · ${txt}</span>`;
+      }
+      const items = sesionesPorFecha[f].map(x => {
+        let flecha = '', nota = '';
+        if (x.delta > 0) flecha = ' <span style="color:var(--accent-green);">▲</span>';
+        else if (x.delta < 0) flecha = ' <span style="color:var(--accent-red);">▼</span>';
+        else if (x.delta === 0) {
+          flecha = ' <span style="color:var(--text-muted);">=</span>';
+          if (rpe && x.prevRpe && rpe < x.prevRpe) nota = `<div style="font-size:11px;color:var(--accent-green);">Misma carga, esfuerzo percibido más bajo que la vez anterior</div>`;
+        }
+        return `<div style="font-size:13px;padding:2px 0;">${escapeHtml(x.ejercicio)}: <b>${escapeHtml(x.kg)} kg</b>${flecha}</div>${nota}`;
+      }).join('');
+      return `<div class="card" style="padding:14px 18px; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><b>${escapeHtml(f)}</b>${badge}</div>
+        ${items}
+      </div>`;
+    }).join('');
+
+    const porEjercicio = {};
+    registros.forEach(r => { (porEjercicio[r.ejercicio.trim()] = porEjercicio[r.ejercicio.trim()] || []).push({ fecha: r.fecha, kg: r.kg_ejecutado }); });
+    window._cargasEjData = porEjercicio;
+    renderCargasChips();
+  }
+
+  function renderCargasChips() {
+    const cont = document.getElementById('cargas-ex-chips');
+    const nombres = Object.keys(window._cargasEjData || {});
+    if (!nombres.length) { cont.innerHTML = ''; return; }
+    cont.innerHTML = nombres.map((n, i) => `<button class="chip ${i === 0 ? 'on' : ''}" onclick="seleccionarCargasEjercicio('${escapeHtml(n).replace(/'/g, "\\'")}', this)">${escapeHtml(n)}</button>`).join('');
+    seleccionarCargasEjercicio(nombres[0], cont.querySelector('.chip'));
+  }
+
+  function seleccionarCargasEjercicio(nombre, btn) {
+    document.querySelectorAll('#cargas-ex-chips .chip').forEach(c => c.classList.remove('on'));
+    if (btn) btn.classList.add('on');
+    const rows = (window._cargasEjData || {})[nombre] || [];
+    document.getElementById('cargas-ex-title').textContent = nombre;
+    const valores = rows.map(r => parseFloat(r.kg)).filter(v => !isNaN(v));
+    const delta = valores.length >= 2 ? (valores[valores.length - 1] - valores[0]) : 0;
+    document.getElementById('cargas-ex-delta').textContent = valores.length >= 2 ? `${delta >= 0 ? '+' : ''}${delta.toFixed(1)} kg` : '';
+    const max = Math.max(...valores, 1), min = Math.min(...valores, 0);
+    const rango = (max - min) || 1;
+    const puntos = valores.map((v, i) => {
+      const x = valores.length > 1 ? (i / (valores.length - 1)) * 540 + 10 : 280;
+      const y = 110 - ((v - min) / rango) * 100;
+      return `${x.toFixed(0)},${y.toFixed(0)}`;
+    }).join(' ');
+    document.getElementById('cargas-ex-curve').setAttribute('points', puntos);
+    document.getElementById('cargas-ex-table').innerHTML = rows.slice().reverse().map((r, i) => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 0;">${escapeHtml(r.fecha)}</td><td style="padding:5px 0;text-align:right;${i === 0 ? 'color:var(--accent-green);font-weight:600;' : ''}">${escapeHtml(r.kg)} kg</td></tr>`).join('');
+  }
+
+  // ─── SECCIÓN BIBLIOTECA (exclusiva coach, agiliza el armado de planes) ─────
+  let _biblioVideos = [];
+
+  function poblarSelectorBiblioteca() {
+    const sel = document.getElementById('biblio-alumno');
+    if (!sel) return;
+    sel.innerHTML = dbAlumnos.map(a => `<option value="${escapeHtml(a.nombre)}">${escapeHtml(a.nombre)}</option>`).join('');
+  }
+
+  async function cargarVideosBiblioteca() {
+    const { data, error } = await _sb.from('ejercicios_videos').select('nombre, categoria, youtube_id, musculos').order('nombre');
+    if (error) { document.getElementById('biblio-grid').innerHTML = `<p style="color:var(--accent-red);">Error al cargar: ${escapeHtml(error.message)}</p>`; return; }
+    _biblioVideos = data || [];
+    const categorias = ['todos', ...new Set(_biblioVideos.map(v => (v.categoria || 'Sin categoría').trim()).filter(Boolean))];
+    document.getElementById('biblio-chips').innerHTML = categorias.map((c, i) =>
+      `<button class="chip ${i === 0 ? 'on' : ''}" data-cat="${escapeHtml(c)}" onclick="filtrarBiblioteca(this)">${escapeHtml(c === 'todos' ? 'Todos' : c)}</button>`
+    ).join('');
+    renderBiblioteca();
+  }
+
+  function filtrarBiblioteca(btn) {
+    document.querySelectorAll('#biblio-chips .chip').forEach(c => c.classList.remove('on'));
+    btn.classList.add('on');
+    renderBiblioteca();
+  }
+
+  function renderBiblioteca() {
+    const q = (document.getElementById('biblio-search')?.value || '').trim().toLowerCase();
+    const catBtn = document.querySelector('#biblio-chips .chip.on');
+    const cat = catBtn ? catBtn.dataset.cat : 'todos';
+    const grid = document.getElementById('biblio-grid');
+    const lista = _biblioVideos.filter(v => {
+      const okCat = cat === 'todos' || (v.categoria || 'Sin categoría').trim() === cat;
+      const okQ = !q || v.nombre.toLowerCase().indexOf(q) !== -1;
+      return okCat && okQ;
+    });
+    if (!lista.length) { grid.innerHTML = '<div class="no-data-msg">Sin resultados.</div>'; return; }
+    grid.innerHTML = lista.map(v => {
+      const thumb = /^[a-zA-Z0-9_-]{6,20}$/.test(v.youtube_id || '')
+        ? `<img src="https://img.youtube.com/vi/${v.youtube_id}/mqdefault.jpg" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px 8px 0 0;" loading="lazy">`
+        : `<div style="width:100%;aspect-ratio:16/9;background:rgba(244,121,32,0.1);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:22px;">▶</div>`;
+      return `<div class="card" style="padding:0; overflow:hidden; margin-bottom:0;">
+        ${thumb}
+        <div style="padding:10px 12px;">
+          <div style="font-size:13px; font-weight:700;">${escapeHtml(v.nombre)}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">${escapeHtml(v.categoria || '—')}</div>
+          <button class="btn" style="width:100%; font-size:11px; padding:7px;" onclick='agregarDesdeBiblioteca(${JSON.stringify(v.nombre)})'>＋ Agregar al plan</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function agregarDesdeBiblioteca(nombreEjercicio) {
+    const atleta = document.getElementById('biblio-alumno').value;
+    if (!atleta) { alert('Elegí primero un deportista.'); return; }
+    const dia = document.getElementById('biblio-dia').value;
+    const bloque = document.getElementById('biblio-bloque').value;
+    const periodo = periodoActualPorAtleta[atleta] || 'Plan General';
+    const containerKey = `d${dia}-${bloque}`;
+
+    if (!dbPlanificaciones[atleta]) dbPlanificaciones[atleta] = {};
+    if (!dbPlanificaciones[atleta][periodo]) dbPlanificaciones[atleta][periodo] = { mesociclo: {}, estructura: {}, activo: true };
+    if (!dbPlanificaciones[atleta][periodo].estructura[containerKey]) dbPlanificaciones[atleta][periodo].estructura[containerKey] = [];
+
+    const id = `${containerKey}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    dbPlanificaciones[atleta][periodo].estructura[containerKey].push({ id, e: nombreEjercicio, rp: '', s: '', c: '' });
+
+    const { error } = await sbGuardarPlan(atleta, dbPlanificaciones[atleta][periodo].estructura, periodo);
+    if (error) { alert('No se pudo guardar: ' + error.message); return; }
+
+    const box = document.getElementById('biblio-agregados');
+    if (box.classList.contains('no-data-msg')) { box.className = ''; box.innerHTML = ''; }
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:13px;';
+    row.innerHTML = `<span>${escapeHtml(nombreEjercicio)} <span style="color:var(--text-muted);">— Día ${escapeHtml(dia)} · ${escapeHtml(bloque)}</span></span>`;
+    const rm = document.createElement('button');
+    rm.className = 'btn-table-delete'; rm.textContent = '✕';
+    rm.onclick = () => quitarDeBiblioteca(atleta, periodo, containerKey, id, row, box);
+    row.appendChild(rm);
+    box.appendChild(row);
+  }
+
+  async function quitarDeBiblioteca(atleta, periodo, containerKey, id, row, box) {
+    dbPlanificaciones[atleta][periodo].estructura[containerKey] = dbPlanificaciones[atleta][periodo].estructura[containerKey].filter(ex => ex.id !== id);
+    const { error } = await sbGuardarPlan(atleta, dbPlanificaciones[atleta][periodo].estructura, periodo);
+    if (error) { alert('No se pudo actualizar: ' + error.message); return; }
+    row.remove();
+    if (!box.children.length) { box.className = 'no-data-msg'; box.innerHTML = 'Todavía no agregaste ningún ejercicio desde acá.'; }
+  }
+
+  async function cargarKgsEjecutados(atleta) {
+    if (!atleta) return;
+    const atl  = dbAlumnos.find(a => a.nombre === atleta);
+    if (!atl?.id) return;
+    const hoy  = new Date().toISOString().split('T')[0];
+    const per  = periodoActualPorAtleta[atleta] || 'Plan General';
+
+    const { data } = await _sb.from('sesiones_ejecutadas')
+      .select('bloque_key, kg_ejecutado')
+      .eq('atleta_id', atl.id)
+      .eq('periodo', per)
+      .eq('fecha', hoy);
+
+    if (!data?.length) return;
+
+    // Poblar los campos kg-real con los valores guardados hoy
+    data.forEach(s => {
+      const rows = document.querySelectorAll(`[data-bloque-key="${s.bloque_key}"]`);
+      rows.forEach(row => {
+        const kgInput = row.querySelector('.ex-kg-real');
+        if (kgInput && s.kg_ejecutado) kgInput.value = s.kg_ejecutado;
+      });
+    });
+  }
+  // ───────────────────────────────────────────────────────────────────────────
+
+  function cambiarPeriodoPlan() {
+    const atleta = document.getElementById('plan-alumno-assigned').value;
+    const periodo = document.getElementById('plan-periodo-select').value;
+    if (!atleta || !periodo) return;
+    periodoActualPorAtleta[atleta] = periodo;
+    cargarPlanDeAtletaSeleccionado();
+  }
+
+  async function crearNuevoPeriodo() {
+    const atleta = document.getElementById('plan-alumno-assigned').value;
+    if (!atleta) { alert('Seleccioná un atleta primero.'); return; }
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const ahora = new Date();
+    const sugerido = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
+    const periodo = prompt('Nombre del nuevo período:', sugerido);
+    if (!periodo || !periodo.trim()) return;
+    const per = periodo.trim();
+    if (dbPlanificaciones[atleta]?.[per]) { alert(`Ya existe el período "${per}".`); return; }
+    if (!dbPlanificaciones[atleta]) dbPlanificaciones[atleta] = {};
+    const planNuevo = { mesociclo: { s1:'Media', s2:'Alta', s3:'Impacto', s4:'Descarga' }, estructura: { 'd1-movilidad':[], 'd1-core':[], 'd1-fuerza':[], 'd2-movilidad':[], 'd2-core':[], 'd2-fuerza':[], 'd3-movilidad':[], 'd3-core':[], 'd3-fuerza':[] }, activo: false };
+    dbPlanificaciones[atleta][per] = planNuevo;
+    periodoActualPorAtleta[atleta] = per;
+    await sbGuardarPlan(atleta, planNuevo, per);
+    syncLocalStorage();
+    cargarPlanDeAtletaSeleccionado();
+    alert(`✅ Período "${per}" creado. Editá el plan y guardalo.`);
+  }
+
+  async function marcarPeriodoActivo() {
+    const atleta = document.getElementById('plan-alumno-assigned').value;
+    const periodo = document.getElementById('plan-periodo-select').value;
+    if (!atleta || !periodo) return;
+    const atl = dbAlumnos.find(a => a.nombre === atleta);
+    if (!atl?.id) return;
+    // Desactivar todos los períodos del atleta
+    await _sb.from('planificaciones').update({ activo: false }).eq('atleta_id', atl.id);
+    // Activar el seleccionado
+    await _sb.from('planificaciones').update({ activo: true }).eq('atleta_id', atl.id).eq('periodo', periodo);
+    // Actualizar memoria
+    Object.keys(dbPlanificaciones[atleta]).forEach(p => { dbPlanificaciones[atleta][p].activo = (p === periodo); });
+    cargarPlanDeAtletaSeleccionado();
+    alert(`✅ "${periodo}" marcado como plan activo.`);
+  }
+
+  async function guardarPlanificacionCompleta() {
+    let atleta = document.getElementById('plan-alumno-assigned').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if (!atleta) return;
+    const periodo = periodoActualPorAtleta[atleta] || 'Plan General';
+    if (!dbPlanificaciones[atleta]) dbPlanificaciones[atleta] = {};
+    if (!dbPlanificaciones[atleta][periodo]) dbPlanificaciones[atleta][periodo] = { mesociclo: {}, estructura: {}, activo: true };
+
+    if(!document.body.classList.contains('mode-alumno')) {
+      dbPlanificaciones[atleta][periodo].mesociclo = {
+        s1: document.getElementById('meso-s1').value,
+        s2: document.getElementById('meso-s2').value,
+        s3: document.getElementById('meso-s3').value,
+        s4: document.getElementById('meso-s4').value
+      };
+    }
+    dbPlanificaciones[atleta][periodo].estructura = {};
+    for(let i = 1; i <= totalDiasPlan; i++) {
+      ['movilidad', 'core', 'fuerza'].forEach(tipo => {
+        const b = `d${i}-${tipo}`;
+        const filas = document.querySelectorAll(`#container-${b} .exercise-row-input`);
+        dbPlanificaciones[atleta][periodo].estructura[b] = Array.from(filas).map(f => ({ id: f.dataset.bloqueKey, e: f.querySelector('.ex-name').value, rp: f.querySelector('.ex-repplan').value, s: f.querySelector('.ex-series').value, c: f.querySelector('.ex-carga').value }));
+      });
+    }
+    const payload = { mesociclo: dbPlanificaciones[atleta][periodo].mesociclo, estructura: dbPlanificaciones[atleta][periodo].estructura };
+    await sbGuardarPlan(atleta, payload, periodo);
+    syncLocalStorage();
+    alert(`✅ Plan "${periodo}" sincronizado con la nube.`);
+    cargarPlanDeAtletaSeleccionado();
+  }
+
+  // SUBTABS LAB
+  function switchSubTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+    document.getElementById(`btn-tab-${tabId}`).classList.add('active');
+  }
+
+  function cambiarAtletaEvaluacion() {
+    document.getElementById('dina-analisis-vacio').style.display = 'block';
+    document.getElementById('dina-analisis-resultado').style.display = 'none';
+    document.getElementById('resultado-fatiga-completo').style.display = 'none';
+    cargarHistorialEvaluacionesAtleta();
+    cargarScreeningEnPantalla();
+    calcularIEVisual();
+  }
+
+  // ── VISTA DE EVALUACIONES PARA EL ATLETA ────────────────────────────────
+  let chartEvolucionAtleta = null;
+
+  function renderAthleteEvalView() {
+    const atleta = usuarioLogueadoActual;
+    const evals  = dbEvaluaciones[atleta] || [];
+    const grid   = document.getElementById('athlete-metric-grid');
+    const tbody  = document.getElementById('tabla-historial-eval-atleta');
+
+    // Buscar última evaluación de cada tipo
+    const lastOf = tipo => [...evals].reverse().find(e => e.tipo === tipo);
+    const ultISO  = lastOf('Isometría Max');
+    const ultCMJ  = lastOf('CMJ');
+    const ultSJ   = lastOf('Squat Jump');
+    const ultFat  = lastOf('Test Fatiga 5x5s');
+
+    // Índice de elasticidad
+    let ie = null;
+    if (ultSJ && ultCMJ) {
+      const hSJ = parseFloat(ultSJ.metricas); const hCMJ = parseFloat(ultCMJ.metricas);
+      if (hSJ > 0) ie = ((hCMJ - hSJ) / hSJ * 100).toFixed(1);
+    }
+
+    // Tarjetas de métricas
+    const tarjetas = [];
+
+    if (ultCMJ) {
+      const h = parseFloat(ultCMJ.metricas);
+      const color = h >= 35 ? 'var(--accent-green)' : h >= 25 ? 'var(--accent-orange)' : 'var(--accent-red)';
+      tarjetas.push(`<div class="metric-card">
+        <div class="metric-label">Salto CMJ</div>
+        <div class="metric-value" style="color:${color}">${h.toFixed(1)}<span style="font-size:16px">cm</span></div>
+        <div class="metric-sub">${h >= 35 ? '🟢 Nivel Elite' : h >= 25 ? '🟡 Nivel Medio' : '🔴 En Desarrollo'}</div>
+        <div class="metric-date">${ultCMJ.fecha}</div>
+      </div>`);
+    }
+
+    if (ultSJ) {
+      const h = parseFloat(ultSJ.metricas);
+      tarjetas.push(`<div class="metric-card">
+        <div class="metric-label">Squat Jump</div>
+        <div class="metric-value" style="color:var(--accent-blue)">${h.toFixed(1)}<span style="font-size:16px">cm</span></div>
+        <div class="metric-sub">Fuerza explosiva pura</div>
+        <div class="metric-date">${ultSJ.fecha}</div>
+      </div>`);
+    }
+
+    if (ie !== null) {
+      const ieNum = parseFloat(ie);
+      const color = (ieNum >= 10 && ieNum <= 15) ? 'var(--accent-green)' : ieNum < 10 ? 'var(--accent-red)' : 'var(--accent-orange)';
+      const txt   = (ieNum >= 10 && ieNum <= 15) ? 'Rango élite' : ieNum < 10 ? 'Déficit elástico' : 'Stiffness alto';
+      tarjetas.push(`<div class="metric-card">
+        <div class="metric-label">Índice Elasticidad</div>
+        <div class="metric-value" style="color:${color}">${ie}<span style="font-size:16px">%</span></div>
+        <div class="metric-sub">${txt}</div>
+      </div>`);
+    }
+
+    if (ultISO) {
+      const diag = ultISO.diagnostico || '';
+      const match = diag.match(/Asim\. Pico: ([\d.]+)%/);
+      const asim = match ? parseFloat(match[1]) : null;
+      if (asim !== null) {
+        const color = asim <= 10 ? 'var(--accent-green)' : 'var(--accent-red)';
+        tarjetas.push(`<div class="metric-card">
+          <div class="metric-label">Asimetría Isométrica</div>
+          <div class="metric-value" style="color:${color}">${asim.toFixed(1)}<span style="font-size:16px">%</span></div>
+          <div class="metric-sub">${asim <= 10 ? '🟢 Balance óptimo' : '🔴 Asimetría crítica'}</div>
+          <div class="metric-date">${ultISO.fecha}</div>
+        </div>`);
+      }
+    }
+
+    if (ultFat) {
+      const match = ultFat.diagnostico.match(/Fatiga D: ([\d.]+)%/);
+      const fd = match ? parseFloat(match[1]) : null;
+      if (fd !== null) {
+        const color = fd <= 15 ? 'var(--accent-green)' : fd <= 25 ? 'var(--accent-orange)' : 'var(--accent-red)';
+        tarjetas.push(`<div class="metric-card">
+          <div class="metric-label">Índice Fatiga</div>
+          <div class="metric-value" style="color:${color}">${fd.toFixed(1)}<span style="font-size:16px">%</span></div>
+          <div class="metric-sub">${fd <= 15 ? '🟢 Resistencia óptima' : fd <= 25 ? '🟡 Fatiga moderada' : '🔴 Fatiga alta'}</div>
+          <div class="metric-date">${ultFat.fecha}</div>
+        </div>`);
+      }
+    }
+
+    grid.innerHTML = tarjetas.length
+      ? tarjetas.join('')
+      : '<div class="no-data-msg">El profesor aún no ha registrado evaluaciones.</div>';
+
+    // Historial completo
+    if (evals.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Sin registros históricos.</td></tr>`;
+    } else {
+      tbody.innerHTML = [...evals].reverse().map(ev =>
+        `<tr><td>${escapeHtml(ev.fecha)}</td><td><span class="badge badge-info">${escapeHtml(ev.tipo)}</span></td><td><b>${escapeHtml(ev.gesto)}</b></td><td>${escapeHtml(ev.metricas)}</td><td>${escapeHtml(ev.diagnostico)}</td></tr>`
+      ).join('');
+    }
+
+    // Gráfico evolución CMJ
+    const cmjData = evals.filter(e => e.tipo === 'CMJ').map(e => ({ fecha: e.fecha, h: parseFloat(e.metricas) || 0 }));
+    if (chartEvolucionAtleta) { chartEvolucionAtleta.destroy(); chartEvolucionAtleta = null; }
+    const ctx = document.getElementById('chartEvolucionAtleta');
+    const msgSinDatosCmj = document.getElementById('cmj-no-data-msg');
+    // Blindaje: si por cualquier motivo el gráfico no está en el DOM, no
+    // frenamos acá el resto del login del atleta (antes esto tiraba un
+    // error que cortaba la ejecución justo antes de mostrarle su plan).
+    if (ctx) {
+      if (cmjData.length >= 2) {
+        chartEvolucionAtleta = new Chart(ctx.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: cmjData.map(d => d.fecha),
+            datasets: [{ label: 'CMJ (cm)', data: cmjData.map(d => d.h), borderColor: '#f47920', backgroundColor: 'rgba(244,121,32,0.08)', tension: 0.3, fill: true, pointBackgroundColor: '#f47920', pointRadius: 5 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, ticks: { callback: v => v + ' cm' } } } }
+        });
+        ctx.style.display = 'block';
+        if (msgSinDatosCmj) msgSinDatosCmj.style.display = 'none';
+      } else {
+        ctx.style.display = 'none';
+        if (msgSinDatosCmj) msgSinDatosCmj.style.display = 'block';
+      }
+    }
+  }
+
+  // DINAMÓMETRO ISOMÉTRICO
+  async function guardarIsometriaMaxima() {
+    const atleta = document.getElementById('eval-alumno-select').value; if(!atleta) return;
+    const grupo = document.getElementById('eva-dina-grupo').value;
+    const pd = parseFloat(document.getElementById('eva-dina-pd').value) || 0;
+    const pi = parseFloat(document.getElementById('eva-dina-pi').value) || 0;
+    const rfdd = parseFloat(document.getElementById('eva-dina-rfdd').value) || 0;
+    const rfdi = parseFloat(document.getElementById('eva-dina-rfdi').value) || 0;
+    const asimPico = (Math.abs(pd - pi) / Math.max(pd, pi)) * 100 || 0;
+    const asimRfd  = (Math.abs(rfdd - rfdi) / Math.max(rfdd, rfdi)) * 100 || 0;
+    document.getElementById('dina-analisis-vacio').style.display = 'none';
+    document.getElementById('dina-analisis-resultado').style.display = 'block';
+    const bPico = document.getElementById('asim-pico-badge'); bPico.innerText = `${asimPico.toFixed(1)}%`;
+    bPico.className = asimPico <= 10 ? 'badge badge-success' : 'badge badge-danger';
+    document.getElementById('asim-pico-txt').innerText = asimPico <= 10 ? 'Balance de Fuerza Óptimo' : 'Asimetría Crítica';
+    const bRfd = document.getElementById('asim-rfd-badge'); bRfd.innerText = `${asimRfd.toFixed(1)}%`;
+    bRfd.className = asimRfd <= 15 ? 'badge badge-success' : 'badge badge-danger';
+    document.getElementById('asim-rfd-txt').innerText = asimRfd <= 15 ? 'Explosividad Balanceada' : 'Déficit de Reclutamiento Temporal';
+    const evalObj = { tipo: 'Isometría Max', gesto: grupo, metricas: `Pico D:${pd}k I:${pi}k`, diagnostico: `Asim. Pico: ${asimPico.toFixed(1)}% | RFD: ${asimRfd.toFixed(1)}%` };
+    if (!dbEvaluaciones[atleta]) dbEvaluaciones[atleta] = [];
+    dbEvaluaciones[atleta].push({ fecha: new Date().toLocaleDateString('es-AR'), ...evalObj });
+    await sbGuardarEvaluacion(atleta, evalObj);
+    syncLocalStorage(); cargarHistorialEvaluacionesAtleta(); renderDashboardAnalytics();
+  }
+
+  // AXON JUMP & ÍNDICE DE ELASTICIDAD
+  async function guardarSaltoAxon() {
+    const atleta = document.getElementById('eval-alumno-select').value; if(!atleta) return;
+    const tipo   = document.getElementById('axon-tipo-salto').value;
+    const tvuelo = parseFloat(document.getElementById('axon-vuelo').value) || 0;
+    const altFinal = ((9.81 * Math.pow(tvuelo/1000, 2)) / 8) * 100;
+    document.getElementById('axon-calc-altura').innerHTML = `${altFinal.toFixed(2)} <span style="font-size:18px;">cm</span>`;
+    const evalObj = { tipo, gesto: 'Tren Inferior', metricas: `${altFinal.toFixed(2)} cm`, diagnostico: `Vuelo: ${tvuelo}ms` };
+    if (!dbEvaluaciones[atleta]) dbEvaluaciones[atleta] = [];
+    dbEvaluaciones[atleta].push({ fecha: new Date().toLocaleDateString('es-AR'), ...evalObj });
+    await sbGuardarEvaluacion(atleta, evalObj);
+    syncLocalStorage();
+    calcularIEVisual(); cargarHistorialEvaluacionesAtleta(); renderDashboardAnalytics();
+  }
+
+  function calcularIEVisual() {
+    let atleta = document.getElementById('eval-alumno-select').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if(!atleta || !dbEvaluaciones[atleta]) return;
+
+    const historial = dbEvaluaciones[atleta];
+    const ultimoSJ = [...historial].reverse().find(e => e.tipo === 'Squat Jump');
+    const ultimoCMJ = [...historial].reverse().find(e => e.tipo === 'CMJ');
+
+    const badge = document.getElementById('axon-ie-badge');
+    const txt = document.getElementById('axon-ie-txt');
+
+    if(ultimoSJ && ultimoCMJ) {
+      const hSJ = parseFloat(ultimoSJ.metricas);
+      const hCMJ = parseFloat(ultimoCMJ.metricas);
+      
+      if(hSJ > 0) {
+        const ie = ((hCMJ - hSJ) / hSJ) * 100;
+        badge.innerText = `${ie.toFixed(1)}%`;
+        
+        if(ie >= 10 && ie <= 15) {
+          badge.className = "badge badge-success";
+          txt.innerText = "Rango de Elasticidad de Élite Óptimo (10-15%)";
+        } else if(ie < 10) {
+          badge.className = "badge badge-danger";
+          txt.innerText = "Déficit elástico explosivo (Requiere trabajo pliométrico)";
+        } else {
+          badge.className = "badge badge-warning";
+          txt.innerText = "Déficit de Fuerza Base / Rigidez (Stiffness Bajo)";
+        }
+        return;
+      }
+    }
+    badge.innerText = "0.0%";
+    badge.className = "badge badge-info";
+    txt.innerText = "Requiere registrar al menos un Squat Jump y un CMJ.";
+  }
+
+  // SCREENING FUNCIONAL
+  async function guardarScreeningFuncional() {
+    const atleta = document.getElementById('eval-alumno-select').value; if(!atleta) return;
+    const datos = {
+      ohs: parseInt(document.getElementById('fms-ohs').value), sls_i: parseInt(document.getElementById('fms-sls-i').value), sls_d: parseInt(document.getElementById('fms-sls-d').value),
+      thomas_i: parseInt(document.getElementById('fms-thomas-i').value), thomas_d: parseInt(document.getElementById('fms-thomas-d').value),
+      rot_int_i: parseInt(document.getElementById('fms-rot-int-i').value), rot_int_d: parseInt(document.getElementById('fms-rot-int-d').value),
+      rot_ext_i: parseInt(document.getElementById('fms-rot-ext-i').value), rot_ext_d: parseInt(document.getElementById('fms-rot-ext-d').value),
+      wells: parseInt(document.getElementById('fms-wells').value), isq_i: parseInt(document.getElementById('fms-isq-i').value), isq_d: parseInt(document.getElementById('fms-isq-d').value),
+      lunge_i: parseInt(document.getElementById('fms-lunge-i').value), lunge_d: parseInt(document.getElementById('fms-lunge-d').value),
+      homb_int_i: parseInt(document.getElementById('fms-homb-int-i').value), homb_int_d: parseInt(document.getElementById('fms-homb-int-d').value),
+      homb_ext_i: parseInt(document.getElementById('fms-homb-ext-i').value), homb_ext_d: parseInt(document.getElementById('fms-homb-ext-d').value)
+    };
+    dbFuncionales[atleta] = datos;
+    await sbGuardarFuncional(atleta, datos);
+    syncLocalStorage();
+    renderDashboardAnalytics();
+    alert("✅ Screening funcional guardado y sincronizado con la nube.");
+  }
+
+  function cargarScreeningEnPantalla() {
+    let atleta = document.getElementById('eval-alumno-select').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if(!atleta || !dbFuncionales[atleta]) return;
+
+    const data = dbFuncionales[atleta];
+    document.getElementById('fms-ohs').value = data.ohs || 3;
+    document.getElementById('fms-sls-i').value = data.sls_i || 3;
+    document.getElementById('fms-sls-d').value = data.sls_d || 3;
+    document.getElementById('fms-thomas-i').value = data.thomas_i || 3;
+    document.getElementById('fms-thomas-d').value = data.thomas_d || 3;
+    document.getElementById('fms-rot-int-i').value = data.rot_int_i || 3;
+    document.getElementById('fms-rot-int-d').value = data.rot_int_d || 3;
+    document.getElementById('fms-rot-ext-i').value = data.rot_ext_i || 3;
+    document.getElementById('fms-rot-ext-d').value = data.rot_ext_d || 3;
+    document.getElementById('fms-wells').value = data.wells || 3;
+    document.getElementById('fms-isq-i').value = data.isq_i || 5;
+    document.getElementById('fms-isq-d').value = data.isq_d || 5;
+    document.getElementById('fms-lunge-i').value = data.lunge_i || 3;
+    document.getElementById('fms-lunge-d').value = data.lunge_d || 3;
+    document.getElementById('fms-homb-int-i').value = data.homb_int_i || 3;
+    document.getElementById('fms-homb-int-d').value = data.homb_int_d || 3;
+    document.getElementById('fms-homb-ext-i').value = data.homb_ext_i || 3;
+    document.getElementById('fms-homb-ext-d').value = data.homb_ext_d || 3;
+  }
+
+  // PROTOCOLO INTERMITENTE 5X5
+  async function calcularYGuardarFatiga5x5() {
+    const atleta = document.getElementById('eval-alumno-select').value; if(!atleta) return;
+    const repsD = ['f-d-r1','f-d-r2','f-d-r3','f-d-r4','f-d-r5'].map(id => parseFloat(document.getElementById(id).value)||0);
+    const mejorD = Math.max(...repsD); const peorD = Math.min(...repsD);
+    const fIndexD = mejorD > 0 ? ((mejorD - peorD) / mejorD) * 100 : 0;
+    const repsI = ['f-i-r1','f-i-r2','f-i-r3','f-i-r4','f-i-r5'].map(id => parseFloat(document.getElementById(id).value)||0);
+    const mejorI = Math.max(...repsI); const peorI = Math.min(...repsI);
+    const fIndexI = mejorI > 0 ? ((mejorI - peorI) / mejorI) * 100 : 0;
+    document.getElementById('resultado-fatiga-completo').style.display = 'block';
+    document.getElementById('fat-d-porcentaje').innerText = `${fIndexD.toFixed(1)}%`;
+    document.getElementById('fat-i-porcentaje').innerText = `${fIndexI.toFixed(1)}%`;
+    const evalObj = { tipo: 'Test Fatiga 5x5s', gesto: 'Miembros Inferiores', metricas: `D: ${mejorD}kg | I: ${mejorI}kg`, diagnostico: `Fatiga D: ${fIndexD.toFixed(1)}% | I: ${fIndexI.toFixed(1)}%` };
+    if(!dbEvaluaciones[atleta]) dbEvaluaciones[atleta] = [];
+    dbEvaluaciones[atleta].push({ fecha: new Date().toLocaleDateString('es-AR'), ...evalObj });
+    await sbGuardarEvaluacion(atleta, evalObj);
+    syncLocalStorage(); cargarHistorialEvaluacionesAtleta();
+  }
+
+  function cargarHistorialEvaluacionesAtleta() {
+    let atleta = document.getElementById('eval-alumno-select').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    const tbody = document.getElementById('tabla-historial-eval');
+    if(!atleta || !dbEvaluaciones[atleta] || dbEvaluaciones[atleta].length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Sin registros históricos.</td></tr>`;
+      return;
+    }
+    // E3 — Una sola asignación a innerHTML en lugar de += por cada registro
+    tbody.innerHTML = dbEvaluaciones[atleta].map(ev =>
+      `<tr><td>${escapeHtml(ev.fecha)}</td><td><span class="badge badge-info">${escapeHtml(ev.tipo)}</span></td><td><b>${escapeHtml(ev.gesto)}</b></td><td>${escapeHtml(ev.metricas)}</td><td>${escapeHtml(ev.diagnostico)}</td></tr>`
+    ).join('');
+  }
+
+  // CALENDARIO DE MONITOREO INTERACTIVO
+  function buildCurrentMonthCalendar() {
+    const grid = document.getElementById('calendar-current-month-grid');
+    const title = document.getElementById('calendar-current-month-title');
+    if(!grid) return;
+    grid.innerHTML = '';
+
+    const ahora = new Date();
+    const anioActual = ahora.getFullYear();
+    const mesActualIdx = ahora.getMonth();
+    
+    const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    title.innerText = `${mesesNombres[mesActualIdx]} ${anioActual}`;
+
+    const primerDia = new Date(anioActual, mesActualIdx, 1).getDay();
+    const offset = primerDia === 0 ? 6 : primerDia - 1;
+    const diasEnMes = new Date(anioActual, mesActualIdx + 1, 0).getDate();
+
+    for (let empty = 0; empty < offset; empty++) { grid.innerHTML += `<div class="day-cell empty"></div>`; }
+
+    for (let d = 1; d <= diasEnMes; d++) {
+      const dateKey = `${anioActual}-${mesActualIdx + 1}-${d}`;
+      // B6 — "clases" iniciaba como "day-cell" y el template ya ponía class="day-cell ...",
+      // resultando en class="day-cell day-cell [today]". Ahora solo se agrega la clase extra si aplica.
+      const extraClass = (d === ahora.getDate()) ? ' today' : '';
+      grid.innerHTML += `<div class="day-cell${extraClass}" id="cal-day-${dateKey}" onclick="selectCalendarDay('${dateKey}')">${d}</div>`;
+    }
+    refreshCalendarViewForAthlete();
+  }
+
+  function selectCalendarDay(dateKey) {
+    if(celdaSeleccionada) { 
+      const elem = document.getElementById(`cal-day-${celdaSeleccionada}`);
+      if(elem) elem.style.borderColor = 'transparent'; 
+    }
+    celdaSeleccionada = dateKey;
+    const actual = document.getElementById(`cal-day-${dateKey}`);
+    if(actual) actual.style.borderColor = 'var(--accent)';
+  }
+
+  async function registrarAsistenciaConRPE() {
+    let atleta = document.getElementById('plan-alumno-assigned').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if(!celdaSeleccionada) { alert("Seleccione un casillero del mes."); return; }
+    const rpeValue = document.getElementById('borg-select-value').value;
+    if(!dbAsistencias[atleta]) dbAsistencias[atleta] = {};
+    const asistObj = { asistido: true, rpe: rpeValue, notas: '' };
+    dbAsistencias[atleta][celdaSeleccionada] = asistObj;
+    await sbGuardarAsistencia(atleta, celdaSeleccionada, asistObj);
+    syncLocalStorage(); refreshCalendarViewForAthlete(); renderDashboardAnalytics();
+    alert("✅ Esfuerzo del día registrado y sincronizado.");
+  }
+
+  function refreshCalendarViewForAthlete() {
+    document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('attended'));
+    let atleta = document.getElementById('plan-alumno-assigned').value;
+    if(document.body.classList.contains('mode-alumno')) { atleta = usuarioLogueadoActual; }
+    if(!atleta || !dbAsistencias[atleta]) return;
+
+    Object.keys(dbAsistencias[atleta]).forEach(dateKey => {
+      if(dbAsistencias[atleta][dateKey].asistido) {
+        const celda = document.getElementById(`cal-day-${dateKey}`);
+        if(celda) { celda.classList.add('attended'); }
+      }
+    });
+  }
+
+  // MODELADO AUTOMÁTICO DE ENTORNO
+  function renderDashboardAnalytics() {
+    let hayAsistenciasReales = false;
+    let rpeData = [0, 0, 0, 0];
+    let counts = [0, 0, 0, 0];
+
+    dbAlumnos.forEach(al => {
+      if (dbAsistencias[al.nombre]) {
+        Object.keys(dbAsistencias[al.nombre]).forEach(k => {
+          const item = dbAsistencias[al.nombre][k];
+          if(item && item.asistido) {
+            hayAsistenciasReales = true;
+            const dia = parseInt(k.split('-')[2]) || 1;
+            const idx = Math.min(3, Math.floor((dia - 1) / 7));
+            rpeData[idx] += parseFloat(item.rpe);
+            counts[idx]++;
+          }
+        });
+      }
+    });
+
+    const boxAlertas = document.getElementById('dashboard-alertas');
+    boxAlertas.innerHTML = '';
+    let contAlertas = 0;
+
+    dbAlumnos.forEach(al => {
+      const f = dbFuncionales[al.nombre];
+      if(f) {
+        if(Math.abs(f.sls_i - f.sls_d) >= 1) {
+          boxAlertas.innerHTML += `<p style='margin-bottom:8px; font-size:13px;'><span class='badge badge-danger'>Asimetría SLS</span> <b>${escapeHtml(al.nombre)}</b>: Desbalance de Estabilidad Lumbo-Pélvica (Sentadilla Unipodal).</p>`;
+          contAlertas++;
+        }
+        if(Math.abs(f.thomas_i - f.thomas_d) >= 1) {
+          boxAlertas.innerHTML += `<p style='margin-bottom:8px; font-size:13px;'><span class='badge badge-warning'>Thomas Test</span> <b>${escapeHtml(al.nombre)}</b>: Restricción asimétrica en Cadena Miofascial Anterior.</p>`;
+          contAlertas++;
+        }
+        if(Math.abs(f.lunge_i - f.lunge_d) >= 1) {
+          boxAlertas.innerHTML += `<p style='margin-bottom:8px; font-size:13px;'><span class='badge badge-danger'>Dorsiflexión Tobillo</span> <b>${escapeHtml(al.nombre)}</b>: Asimetría severa de rango articular en Test de Lunge.</p>`;
+          contAlertas++;
+        }
+        if(f.isq_i === 2 || f.isq_d === 2) {
+          boxAlertas.innerHTML += `<p style='margin-bottom:8px; font-size:13px;'><span class='badge badge-warning'>Cadena Posterior</span> <b>${escapeHtml(al.nombre)}</b>: Acortamiento de Isquiosurales en Extensión.</p>`;
+          contAlertas++;
+        }
+      }
+    });
+
+    if(contAlertas === 0) {
+      boxAlertas.innerHTML = `<p style="color:var(--text-muted); font-size:13px; font-family:var(--font-mono); text-align:center; padding:40px 0;">Cadenas miofasciales estables. Sin alertas críticas.</p>`;
+    }
+
+    if(!hayAsistenciasReales) {
+      document.getElementById('dash-chart-placeholder').style.display = 'block';
+      document.getElementById('chartAsistencia').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('dash-chart-placeholder').style.display = 'none';
+    document.getElementById('chartAsistencia').style.display = 'block';
+
+    const finalData = rpeData.map((val, i) => counts[i] > 0 ? (val / counts[i]) : 10);
+
+    if(globalChartInstance) globalChartInstance.destroy();
+    globalChartInstance = new Chart(document.getElementById('chartAsistencia').getContext('2d'), {
+      type: 'line', 
+      data: { 
+        labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], 
+        datasets: [{ 
+          label: 'Índice de Carga Interna (Borg RPE Promedio)', 
+          data: finalData, 
+          borderColor: '#f47920', 
+          backgroundColor: 'rgba(244,121,32,0.05)',
+          tension: 0.3,
+          fill: true
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        scales: { y: { min: 6, max: 20 } }
+      }
+    });
+  }
+
+  // ─── VIDEO INLINE ────────────────────────────────────────────────────────
+  async function toggleVideoInline(btn) {
+    const row = btn.closest('.exercise-row-input');
+    const nombre = row.querySelector('.ex-name').value.trim();
+    if (!nombre) { alert('Escribí el nombre del ejercicio primero.'); return; }
+
+    let vc = row.nextElementSibling;
+    if (vc && vc.classList.contains('inline-video-container')) {
+      vc.remove(); btn.style.background = 'rgba(244,121,32,0.15)'; return;
+    }
+
+    btn.innerText = '⌛'; btn.disabled = true;
+
+    const { data } = await _sb
+      .from('ejercicios_videos')
+      .select('*')
+      .ilike('nombre_busqueda', `%${nombre.toLowerCase()}%`)
+      .limit(1)
+      .maybeSingle();
+
+    btn.innerText = '▶'; btn.disabled = false;
+
+    vc = document.createElement('div');
+    vc.className = 'inline-video-container';
+
+    if (data && /^[a-zA-Z0-9_-]{6,20}$/.test(data.youtube_id || '')) {
+      const embedUrl = `https://www.youtube.com/embed/${data.youtube_id}?rel=0&playsinline=1&modestbranding=1`;
+      const ytUrl    = `https://www.youtube.com/watch?v=${data.youtube_id}`;
+      vc.innerHTML = `
+        <iframe class="inline-video-frame"
+          src="${embedUrl}"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        </iframe>
+        <div style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:12px; background:#000; border-radius:8px 8px 0 0; min-height:120px;">
+          <p style="color:var(--text-muted); font-size:13px; font-family:var(--font-mono); text-align:center;">Video no disponible en modo inline</p>
+          <a href="${ytUrl}" target="_blank" style="background:var(--accent); color:#000; padding:10px 20px; border-radius:8px; font-weight:700; font-size:13px; text-decoration:none;">▶ Ver en YouTube</a>
+        </div>
+        <div class="inline-video-info">
+          <div class="inline-video-meta">
+            <b>💪 ${escapeHtml(data.musculos) || 'Músculos no especificados'}</b>
+            <p>${escapeHtml(data.descripcion) || 'Sin indicación técnica cargada.'}</p>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <a href="${ytUrl}" target="_blank" style="background:rgba(244,121,32,0.15); color:var(--accent); border:1px solid rgba(244,121,32,0.3); padding:5px 10px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none;">YouTube ↗</a>
+            <button class="inline-video-close" onclick="this.closest('.inline-video-container').remove()">✕</button>
+          </div>
+        </div>`;
+      btn.style.background = 'rgba(244,121,32,0.35)';
+    } else {
+      vc.innerHTML = `<div class="inline-video-notfound">📭 Sin video para <b>"${escapeHtml(nombre)}"</b> — subilo a YouTube y sincronizá.</div>`;
+      setTimeout(() => vc.remove(), 3000);
+    }
+    row.parentNode.insertBefore(vc, row.nextSibling);
+  }
+
+  // ─── SINCRONIZADOR YOUTUBE → SUPABASE ─────────────────────────────────────
+  function inferirCategoria(nombre) {
+    const n = nombre.toLowerCase();
+    if (n.match(/movilidad|estiramiento|elongacion|flexibilidad/)) return 'Movilidad';
+    if (n.match(/core|plancha|abdominal|bicho|pallof|hollow/))     return 'Core';
+    if (n.match(/salto|sprint|potencia|pliometrico|cmj/))          return 'Potencia';
+    if (n.match(/velocidad|agilidad|escalera|conos/))              return 'Velocidad';
+    return 'Fuerza';
+  }
+
+  async function sincronizarYouTube() {
+    const btn = document.getElementById('btn-sync-yt');
+    const YT_KEY = 'AIzaSyCva56btq4hTa-WZbiUUyXM-140Jjt028Y';
+    const YT_CH  = 'UC8wWoYnY94aPjOKsrjYqm7w';
+    btn.disabled = true; btn.innerText = '🔄 Conectando...';
+
+    try {
+      const chResp = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YT_CH}&key=${YT_KEY}`);
+      const chData = await chResp.json();
+      if (!chData.items?.length) { alert('Canal no encontrado.'); return; }
+      const playlistId = chData.items[0].contentDetails.relatedPlaylists.uploads;
+
+      let videos = [], nextPage = null, pagina = 1;
+      do {
+        btn.innerText = `🔄 Leyendo página ${pagina}...`;
+        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${YT_KEY}${nextPage ? '&pageToken='+nextPage : ''}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data.items) videos = videos.concat(data.items);
+        nextPage = data.nextPageToken; pagina++;
+      } while (nextPage);
+
+      const rows = videos.map(v => ({
+        nombre:          v.snippet.title.replace(/_/g,' ').replace(/\s+/g,' ').trim(),
+        nombre_busqueda: v.snippet.title.replace(/_/g,' ').replace(/\s+/g,' ').trim().toLowerCase(),
+        youtube_id:      v.snippet.resourceId.videoId,
+        categoria:       inferirCategoria(v.snippet.title)
+      }));
+
+      let ok = 0;
+      for (let i = 0; i < rows.length; i += 50) {
+        btn.innerText = `📥 Importando ${ok}/${rows.length}...`;
+        const { error } = await _sb.from('ejercicios_videos')
+          .upsert(rows.slice(i, i+50), { onConflict: 'youtube_id' });
+        if (!error) ok += rows.slice(i, i+50).length;
+      }
+
+      btn.innerText = '⚡ Sincronizar YouTube'; btn.disabled = false;
+      alert(`✅ ${ok} de ${rows.length} videos sincronizados con la nube.`);
+
+    } catch(err) {
+      alert('Error: ' + err.message);
+      btn.innerText = '⚡ Sincronizar YouTube'; btn.disabled = false;
+    }
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  function openVideoModal(name) {}
+  
+  function closeVideoModal() { document.getElementById('modal-video-reproductor').style.display = 'none'; }
+
+  function switchView(viewId) {
+    // B1 — El substring(0,4) anterior mapeaba 'calendario' → 'cale', buscando id="nav-cale" que no existía.
+    // E1 — Mapa explícito: elimina el acoplamiento frágil; cualquier cambio de nombre es visible aquí.
+    const NAV_MAP = {
+      dashboard:       'nav-dash',
+      alumnos:         'nav-alum',
+      planificaciones: 'nav-plan',
+      evaluaciones:    'nav-eval',
+      calendario:      'nav-cal',
+      cargas:          'nav-cargas',
+      biblioteca:      'nav-biblio'
+    };
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-menu .nav-item').forEach(i => i.classList.remove('active'));
+    const sec = document.getElementById('view-' + viewId);
+    if(sec) sec.classList.add('active');
+    const nav = document.getElementById(NAV_MAP[viewId]);
+    if(nav) nav.classList.add('active');
+  }
+
+  window.onload = async () => {
+    try {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) {
+        coachUserId = session.user.id;
+        usuarioLogueadoActual = "Franco Flores";
+        document.body.classList.remove('mode-alumno');
+        document.body.classList.add('mode-coach');
+        document.getElementById('role-display-status').innerText = "👑 ENTORNO DE TRABAJO: ENTRENADOR DE ALTO RENDIMIENTO";
+        document.getElementById('label-user-logged').innerText   = "Profesor: Franco Flores";
+        document.getElementById('app-login-screen').style.display = 'none';
+        await cargarDatosDesdeSupabase();
+      } else {
+        cargarCacheLocal();
+      }
+    } catch(err) {
+      // Si Supabase falla (archivo local, sin internet, etc.) → cargamos caché local
+      console.warn('Supabase no disponible, usando caché local:', err.message);
+      cargarCacheLocal();
+      // Asegurar que el overlay no quede bloqueando
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+    actualizarEntornoDeDatos();
+    renderAlumnosTable();
+    poblarSelectorCargas();
+    poblarSelectorBiblioteca();
+    cargarVideosBiblioteca();
+  };
+</script>
+</body>
+</html>
